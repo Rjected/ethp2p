@@ -10,7 +10,7 @@ pub struct BlockHashNumber {
     pub number: u64,
 }
 
-/// A new block with the current total difficulty.
+/// A new block with the current total difficult, which includes the difficulty of the returned block.
 pub struct NewBlock {
     pub block: Block<(TypedTransaction, Signature)>,
     pub td: Uint<128, 4>,
@@ -18,8 +18,13 @@ pub struct NewBlock {
 
 // TODO: Introduce SignedMessage type (with fastrlp encoding) to ethers
 
-/// TODO: comment
+/// This informs peers of transactions that have appeared on the network
 pub struct Transactions(Vec<(TypedTransaction, Signature)>);
 
-/// TODO: comment
+/// This informs peers of transaction hashes for transactions that have appeared on the network,
+/// but have not been included in a block.
+/// TODO: question: are there limits to how many hashes the client stores? The peer broadcasting
+/// this message is not guaranteed to have the hash preimage, so clients need limits on hashes they
+/// will request. A peer could respond to a GetPooledTransactions message with an empty list, and
+/// that would be valid. Could this allow peers to corrupt client tx hash pools with fake tx hashes?
 pub struct NewPooledTransactionHashes(Vec<[u8; 32]>);

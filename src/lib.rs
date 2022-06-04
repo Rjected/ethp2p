@@ -1,5 +1,5 @@
 mod broadcast;
-pub use broadcast::{NewBlock, NewBlockHashes, Transactions, NewPooledTransactionHashes};
+pub use broadcast::{NewBlock, NewBlockHashes, NewPooledTransactionHashes, Transactions};
 
 mod message;
 pub use message::EthMessage;
@@ -8,4 +8,13 @@ mod status;
 pub use status::Status;
 
 mod blocks;
-pub use blocks::{GetBlockHeaders, BlockHeaders, GetBlockBodies, BlockBodies};
+pub use blocks::{BlockBodies, BlockHeaders, GetBlockBodies, GetBlockHeaders};
+
+mod transactions;
+pub use transactions::{GetPooledTransactions, PooledTransactions};
+
+mod receipts;
+pub use receipts::{GetReceipts, Receipts};
+
+mod state;
+pub use state::{GetNodeData, NodeData};

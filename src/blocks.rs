@@ -28,13 +28,14 @@ pub struct GetBlockHeaders {
     pub reverse: bool,
 }
 
+// TODO: header fastrlp
+
 /// The response to [GetBlockHeaders](crate::GetBlockHeaders), containing headers if any headers were
 /// found.
 /// TODO: question: what if a node returns headers in the wrong order? How much work will the
 /// recipient do before determining that the message was invalid? again, why use this skip
 /// functionality? what optimization is being enabled and how is it implemented? under untrusted
 /// input is it free from DoS vulnerabilities?
-/// also TODO: header fastrlp
 pub struct BlockHeaders(Vec<Header>);
 
 /// A request for a peer to return block bodies for the given block hashes.

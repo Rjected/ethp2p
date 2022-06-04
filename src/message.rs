@@ -1,8 +1,11 @@
 use crate::{
     blocks::{BlockBodies, BlockHeaders, GetBlockBodies},
     broadcast::{NewBlock, NewBlockHashes, NewPooledTransactionHashes, Transactions},
-    GetBlockHeaders, Status,
+    GetBlockHeaders, GetNodeData, GetPooledTransactions, GetReceipts, NodeData, PooledTransactions,
+    Receipts, Status,
 };
+
+// TODO: determine whats up with this enum variant size warning
 
 /// Represents a message in the eth wire protocol, versions 65 and 66.
 ///
@@ -28,12 +31,12 @@ pub enum EthMessage {
     BlockHeaders(RequestPair<BlockHeaders>),
     GetBlockBodies(RequestPair<GetBlockBodies>),
     BlockBodies(RequestPair<BlockBodies>),
-    GetPooledTransactions(),
-    PooledTransactions(),
-    GetNodeData(),
-    NodeData(),
-    GetReceipts(),
-    Receipts(),
+    GetPooledTransactions(RequestPair<GetPooledTransactions>),
+    PooledTransactions(RequestPair<PooledTransactions>),
+    GetNodeData(RequestPair<GetNodeData>),
+    NodeData(RequestPair<NodeData>),
+    GetReceipts(RequestPair<GetReceipts>),
+    Receipts(RequestPair<Receipts>),
 }
 
 /// This represents a network message which has a request id
@@ -46,4 +49,4 @@ pub struct RequestPair<T> {
 }
 
 // TODO: implement rlp encoding/decoding for RequestPair<T> where T: rlp encodable / decodable
-// TODO: question: is encoding / decoding for Vec<T> where T: encodable / decodable implemented?
+// TODO: question: is encoding / decoding for Vec<T> where T: encodable / decodable auto implemented?
