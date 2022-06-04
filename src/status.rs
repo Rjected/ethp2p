@@ -27,6 +27,6 @@ pub struct Status {
     /// The genesis hash of the peer's chain
     pub genesis: [u8; 32],
 
-    /// The fork identifier, a [CRC32 checksum] for identifying the node's most as defined by [EIP-142](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2124.md).
+    /// The fork identifier, a [CRC32 checksum](https://en.wikipedia.org/wiki/Cyclic_redundancy_check#CRC-32_algorithm) for identifying the peer's fork as defined by [EIP-2124](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2124.md).
     pub forkid: ForkId,
 }
