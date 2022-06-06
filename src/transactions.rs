@@ -8,8 +8,6 @@ pub struct GetPooledTransactions(Vec<[u8; 32]>);
 ///
 /// This response may not contain all bodies requested, but the bodies should be in the same order
 /// as the request's hashes. Hashes may be skipped, and the client should ensure that each body
-/// corresponds to a requested hash. Hashes may need to be re-requested if they
-/// TODO: question: do nodes automatically re request? nodes can implement arbitrary response
-/// limits on the response size, what happens if we respond with a single hash, in a long ish
-/// amount of time? the mempool would be populated more slowly I guess.
+/// corresponds to a requested hash. Hashes may need to be re-requested if the bodies are not
+/// included in the response.
 pub struct PooledTransactions(Vec<(TypedTransaction, Signature)>);

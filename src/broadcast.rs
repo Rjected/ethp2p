@@ -23,8 +23,4 @@ pub struct Transactions(Vec<(TypedTransaction, Signature)>);
 
 /// This informs peers of transaction hashes for transactions that have appeared on the network,
 /// but have not been included in a block.
-/// TODO: question: are there limits to how many hashes the client stores? The peer broadcasting
-/// this message is not guaranteed to have the hash preimage, so clients need limits on hashes they
-/// will request. A peer could respond to a GetPooledTransactions message with an empty list, and
-/// that would be valid. Could this allow peers to corrupt client tx hash pools with fake tx hashes?
 pub struct NewPooledTransactionHashes(Vec<[u8; 32]>);
