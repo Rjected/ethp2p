@@ -1,5 +1,5 @@
 use ethereum_forkid::ForkId;
-use ethers::prelude::Chain;
+use ethers::types::Chain;
 use ruint::Uint;
 
 /// The status message is used in the eth protocol handshake to ensure that peers are on the same
@@ -9,6 +9,7 @@ use ruint::Uint;
 ///
 /// When performing a handshake, the total difficulty is not guaranteed to correspond to the block
 /// hash. This information should be treated as untrusted.
+#[derive(Clone, Debug)]
 pub struct Status {
     /// The current protocol version. For example, peers running eth/65 would have a version of 65.
     pub version: u8,
