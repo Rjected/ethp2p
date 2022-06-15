@@ -50,41 +50,29 @@ pub struct RequestPair<T> {
     pub request_id: u64,
 
     /// the request or response message payload
-    pub message: Option<T>,
+    pub message: T,
 }
 
 /// Allows request messages with request ids to be serialized as RLP.
-/// All request messages encode the payload as a list after encoding the request id.
 impl<T> Encodable for RequestPair<T>
 where
-    T: Encodable,
+    T: Encodable + Clone,
 {
     fn length(&self) -> usize {
-        // the length will be
-        let message_len = match &self.message {
-            Some(message) => message.length(),
-            // if there is no payload, it will be represented as an empty list, c0, which has length 1
-            None => 1,
-        };
-        self.request_id.length() + message_len
+        self.request_id.length() + self.message.length()
     }
 
     fn encode(&self, out: &mut dyn fastrlp::BufMut) {
-        // no payload, regardless of type, means we will encode an empty list.
-        let message_vec = match &self.message {
-            Some(message) => vec![message],
-            None => vec![],
-        };
 
         #[derive(RlpEncodable)]
         struct Pair<Z: Encodable> {
             pub request_id: u64,
-            pub message: Vec<Z>,
+            pub message: Z,
         }
 
         let encodable_pair = Pair {
             request_id: self.request_id,
-            message: message_vec,
+            message: self.message.clone(),
         };
 
         encodable_pair.encode(out);
@@ -100,21 +88,14 @@ where
         #[derive(RlpDecodable)]
         struct Pair<Z: Decodable> {
             pub request_id: u64,
-            pub message: Vec<Z>,
+            pub message: Z,
         }
 
         let pair: Pair<T> = Pair::decode(buf)?;
-        if pair.message.len() > 1 {
-            // TODO: better error message
-            return Err(fastrlp::DecodeError::Custom(
-                "Did not expect multiple requests while decoding",
-            ));
-        }
 
-        // now we know there is a single element in the vec
         Ok(Self {
             request_id: pair.request_id,
-            message: pair.message.first().map(|item| item.to_owned()),
+            message: pair.message,
         })
     }
 }
@@ -135,8 +116,9 @@ mod test {
     fn request_pair_encode() {
         let request_pair = RequestPair {
             request_id: 1337,
-            message: Some(5u8),
+            message: vec![5u8],
         };
+
         // c5: start of list (c0) + len(full_list) (length is <55 bytes)
         // 82: 0x80 + len(1337)
         // 05 39: 1337 (request_id)
@@ -155,49 +137,15 @@ mod test {
     }
 
     #[test]
-    fn empty_pair_encode() {
-        let request_pair = RequestPair::<u8> {
-            request_id: 1337,
-            message: None,
-        };
-
-        // c4: start of list (c0) + len(full_list)
-        // 82: 0x80 + len(1337)
-        // 05 39: 1337 (request_id)
-        // === full_list ===
-        // c0: start of list (c0) + len(list) (length is 0)
-        let expected = hex!("c4820539c0");
-        let got = encode(request_pair);
-        assert_eq!(
-            expected[..],
-            got,
-            "expected: {:X?}, got: {:X?}",
-            expected,
-            got,
-        );
-    }
-
-    #[test]
-    fn empty_pair_decode() {
-        let mut raw_pair = &hex!("c4820539c0")[..];
-
-        let expected = RequestPair::<u8> {
-            request_id: 1337,
-            message: None,
-        };
-        let got = RequestPair::<u8>::decode(&mut raw_pair).unwrap();
-        assert_eq!(expected, got);
-    }
-
-    #[test]
     fn request_pair_decode() {
         let mut raw_pair = &hex!("c5820539c105")[..];
 
         let expected = RequestPair {
             request_id: 1337,
-            message: Some(5u8),
+            message: vec![5u8],
         };
-        let got = RequestPair::<u8>::decode(&mut raw_pair).unwrap();
+
+        let got = RequestPair::<Vec<u8>>::decode(&mut raw_pair).unwrap();
         assert_eq!(expected, got);
     }
 }
