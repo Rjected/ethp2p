@@ -20,6 +20,7 @@ use crate::{
 ///
 ///  The newer eth/66 is an efficiency upgrade on top of eth/65, introducing a request id to correlate
 ///  request-response message pairs.
+#[derive(Clone, Debug, PartialEq)]
 pub enum EthMessage {
     // Status is required for the protocol handshake
     Status(Status),
@@ -44,7 +45,7 @@ pub enum EthMessage {
 }
 
 /// This represents a network message which has a request id
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct RequestPair<T> {
     /// id for the contained request or response message
     pub request_id: u64,

@@ -82,6 +82,7 @@ impl Decodable for BlockHashOrNumber {
 
 /// The response to [GetBlockHeaders](crate::GetBlockHeaders), containing headers if any headers were
 /// found.
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct BlockHeaders(Vec<Header>);
 
 /// A request for a peer to return block bodies for the given block hashes.
@@ -91,6 +92,7 @@ pub struct GetBlockBodies(Vec<[u8; 32]>);
 // TODO: again, signed message in ethers
 /// The response to [GetBlockBodies](crate::GetBlockBodies), containing the block bodies that the
 /// peer knows about if any were found.
+#[derive(Clone, Debug, PartialEq)]
 pub struct BlockBodies(Vec<Block<(TypedTransaction, Signature)>>);
 
 #[cfg(test)]
