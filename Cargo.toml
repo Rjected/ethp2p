@@ -12,6 +12,7 @@ fastrlp = { version = "0.1.0", features = ["alloc", "derive", "std"] }
 ruint = { git = "https://github.com/recmo/uint", features = ["fastrlp"] }
 ethereum-forkid = { git = "https://github.com/rust-ethereum/forkid" }
 anvil-core = { git = "https://github.com/foundry-rs/foundry" }
+foundry-config = { git = "https://github.com/foundry-rs/foundry" }
 
 [dev-dependencies]
 hex-literal = "0.3.4"

@@ -1,5 +1,5 @@
 use ethereum_forkid::ForkId;
-use ethers::types::Chain;
+use foundry_config::Chain;
 use ruint::Uint;
 
 /// The status message is used in the eth protocol handshake to ensure that peers are on the same
@@ -35,3 +35,5 @@ pub struct Status {
     /// [EIP-2124](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2124.md).
     pub forkid: ForkId,
 }
+
+
