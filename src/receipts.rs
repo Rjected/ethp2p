@@ -1,5 +1,5 @@
 use ethers::prelude::TransactionReceipt;
-use fastrlp::{RlpEncodable, RlpDecodable};
+use fastrlp::{RlpDecodable, RlpEncodable};
 
 /// A request for transaction receipts from the given block hashes.
 #[derive(Clone, Debug, PartialEq, Eq, RlpEncodable, RlpDecodable)]

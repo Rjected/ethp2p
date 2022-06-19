@@ -1,6 +1,6 @@
 use anvil_core::eth::block::Header;
 use ethers::types::{transaction::eip2718::TypedTransaction, Block, Signature};
-use fastrlp::{Encodable, Decodable, RlpEncodable, RlpDecodable};
+use fastrlp::{Decodable, Encodable, RlpDecodable, RlpEncodable};
 
 /// A request for a peer to return block headers starting at the requested block
 /// TODO: better comment including limit / skip / reverse rules
@@ -36,22 +36,14 @@ pub enum BlockHashOrNumber {
 impl Encodable for BlockHashOrNumber {
     fn length(&self) -> usize {
         match self {
-            Self::Hash(block_hash) => {
-                block_hash.length()
-            }
-            Self::Number(block_number) => {
-                block_number.length()
-            }
+            Self::Hash(block_hash) => block_hash.length(),
+            Self::Number(block_number) => block_number.length(),
         }
     }
     fn encode(&self, out: &mut dyn bytes::BufMut) {
         match self {
-            Self::Hash(block_hash) => {
-                block_hash.encode(out)
-            }
-            Self::Number(block_number) => {
-                block_number.encode(out)
-            }
+            Self::Hash(block_hash) => block_hash.encode(out),
+            Self::Number(block_number) => block_number.encode(out),
         }
     }
 }

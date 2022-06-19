@@ -1,4 +1,4 @@
-use fastrlp::{RlpEncodable, RlpDecodable};
+use fastrlp::{RlpDecodable, RlpEncodable};
 
 /// A request for state tree nodes corresponding to the given hashes.
 #[derive(Clone, Debug, PartialEq, Eq, RlpEncodable, RlpDecodable)]

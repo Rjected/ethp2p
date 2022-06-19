@@ -44,6 +44,31 @@ pub enum EthMessage {
     Receipts(RequestPair<Receipts>),
 }
 
+impl Encodable for EthMessage {
+    fn length(&self) -> usize {
+        match self {
+            EthMessage::Status(a) => a.length(),
+            _ => {
+                todo!()
+            }
+        }
+    }
+    fn encode(&self, out: &mut dyn bytes::BufMut) {
+        match self {
+            EthMessage::Status(a) => a.encode(out),
+            _ => {
+                todo!()
+            }
+        }
+    }
+}
+
+impl Decodable for EthMessage {
+    fn decode(buf: &mut &[u8]) -> Result<Self, fastrlp::DecodeError> {
+        todo!()
+    }
+}
+
 /// This represents a network message which has a request id
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct RequestPair<T> {
@@ -64,7 +89,6 @@ where
     }
 
     fn encode(&self, out: &mut dyn fastrlp::BufMut) {
-
         #[derive(RlpEncodable)]
         struct Pair<Z: Encodable> {
             pub request_id: u64,

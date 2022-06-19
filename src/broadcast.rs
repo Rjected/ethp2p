@@ -1,5 +1,5 @@
 use ethers::types::{transaction::eip2718::TypedTransaction, Block, Signature};
-use fastrlp::{RlpEncodable, RlpDecodable};
+use fastrlp::{RlpDecodable, RlpEncodable};
 use ruint::Uint;
 
 /// This informs peers of new blocks that have appeared on the network.
@@ -17,7 +17,7 @@ pub struct BlockHashNumber {
 #[derive(Clone, Debug, PartialEq)]
 pub struct NewBlock {
     pub block: Block<(TypedTransaction, Signature)>,
-    pub td: Uint<128, 4>,
+    pub td: Uint<128, 2>,
 }
 
 // TODO: Introduce SignedMessage type (with fastrlp encoding) to ethers
