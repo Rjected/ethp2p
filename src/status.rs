@@ -78,10 +78,10 @@ where
 #[cfg(test)]
 mod tests {
     use ethereum_forkid::{ForkHash, ForkId};
+    use fastrlp::Encodable;
     use foundry_config::Chain;
     use hex_literal::hex;
-    use fastrlp::Encodable;
-    use ruint::{Uint, uint};
+    use ruint::{uint, Uint};
 
     use crate::{EthVersion, Status};
 
