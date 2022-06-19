@@ -11,7 +11,7 @@ use crate::{
 
 // TODO: determine whats up with this enum variant size warning
 
-/// Represents a message in the eth wire protocol, versions 65 and 66.
+/// Represents a message in the eth wire protocol, versions 65, 66 and 67.
 ///
 /// The ethereum wire protocol is a set of messages that are broadcasted to the network in two
 /// styles:
