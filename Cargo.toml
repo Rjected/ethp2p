@@ -6,13 +6,20 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-bytes = { version = "1.1.0" }
+anvil-core = { git = "https://github.com/foundry-rs/foundry" }
+foundry-config = { git = "https://github.com/foundry-rs/foundry" }
 ethers = { git = "https://github.com/gakonst/ethers-rs" }
+bytes = { version = "1.1.0" }
 fastrlp = { version = "0.1.0", features = ["alloc", "derive", "std"] }
 ruint = { git = "https://github.com/recmo/uint", features = ["fastrlp"] }
 ethereum-forkid = { git = "https://github.com/rust-ethereum/forkid" }
-anvil-core = { git = "https://github.com/foundry-rs/foundry" }
-foundry-config = { git = "https://github.com/foundry-rs/foundry" }
 
 [dev-dependencies]
 hex-literal = "0.3.4"
+
+[patch."https://github.com/foundry-rs/foundry"]
+anvil-core = { git = "https://github.com/rjected/foundry", branch = "fastrlp-chain" }
+foundry-config = { git = "https://github.com/rjected/foundry", branch = "fastrlp-chain" }
+
+[patch."https://github.com/gakonst/ethers-rs"]
+ethers = { git = "https://github.com/rjected/ethers-rs", branch = "fastrlp-tx" }
