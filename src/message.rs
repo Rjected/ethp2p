@@ -9,6 +9,87 @@ use crate::{
     Receipts, Status,
 };
 
+#[derive(Clone, Debug, PartialEq)]
+pub struct ProtocolMessage {
+    pub message_type: EthMessageID,
+    pub message: EthMessage,
+}
+
+/// Encodes the protocol message into bytes.
+/// The message type is encoded as a single byte and prepended to the message.
+impl Encodable for ProtocolMessage {
+    fn length(&self) -> usize {
+        self.message_type.length() + self.message.length()
+    }
+    fn encode(&self, out: &mut dyn bytes::BufMut) {
+        self.message_type.encode(out);
+        self.message.encode(out);
+    }
+}
+
+/// Decodes a protocol message from bytes, using the first byte to determine the message type.
+/// This decodes eth/66 request ids for each message type.
+impl Decodable for ProtocolMessage {
+    fn decode(buf: &mut &[u8]) -> Result<Self, fastrlp::DecodeError> {
+        let message_type = EthMessageID::decode(buf)?;
+        let message = match message_type {
+            EthMessageID::Status => EthMessage::Status(Status::decode(buf)?),
+            EthMessageID::NewBlockHashes => {
+                EthMessage::NewBlockHashes(NewBlockHashes::decode(buf)?)
+            }
+            EthMessageID::NewBlock => EthMessage::NewBlock(NewBlock::decode(buf)?),
+            EthMessageID::Transactions => EthMessage::Transactions(Transactions::decode(buf)?),
+            EthMessageID::NewPooledTransactionHashes => {
+                EthMessage::NewPooledTransactionHashes(NewPooledTransactionHashes::decode(buf)?)
+            }
+            EthMessageID::GetBlockHeaders => {
+                let request_pair = RequestPair::<GetBlockHeaders>::decode(buf)?;
+                EthMessage::GetBlockHeaders(request_pair)
+            }
+            EthMessageID::BlockHeaders => {
+                let request_pair = RequestPair::<BlockHeaders>::decode(buf)?;
+                EthMessage::BlockHeaders(request_pair)
+            }
+            EthMessageID::GetBlockBodies => {
+                let request_pair = RequestPair::<GetBlockBodies>::decode(buf)?;
+                EthMessage::GetBlockBodies(request_pair)
+            }
+            EthMessageID::BlockBodies => {
+                let request_pair = RequestPair::<BlockBodies>::decode(buf)?;
+                EthMessage::BlockBodies(request_pair)
+            }
+            EthMessageID::GetPooledTransactions => {
+                let request_pair = RequestPair::<GetPooledTransactions>::decode(buf)?;
+                EthMessage::GetPooledTransactions(request_pair)
+            }
+            EthMessageID::PooledTransactions => {
+                let request_pair = RequestPair::<PooledTransactions>::decode(buf)?;
+                EthMessage::PooledTransactions(request_pair)
+            }
+            EthMessageID::GetNodeData => {
+                let request_pair = RequestPair::<GetNodeData>::decode(buf)?;
+                EthMessage::GetNodeData(request_pair)
+            }
+            EthMessageID::NodeData => {
+                let request_pair = RequestPair::<NodeData>::decode(buf)?;
+                EthMessage::NodeData(request_pair)
+            }
+            EthMessageID::GetReceipts => {
+                let request_pair = RequestPair::<GetReceipts>::decode(buf)?;
+                EthMessage::GetReceipts(request_pair)
+            }
+            EthMessageID::Receipts => {
+                let request_pair = RequestPair::<Receipts>::decode(buf)?;
+                EthMessage::Receipts(request_pair)
+            }
+        };
+        Ok(ProtocolMessage {
+            message_type,
+            message,
+        })
+    }
+}
+
 // TODO: determine whats up with this enum variant size warning
 
 /// Represents a message in the eth wire protocol, versions 65, 66 and 67.
@@ -47,47 +128,95 @@ pub enum EthMessage {
 impl Encodable for EthMessage {
     fn length(&self) -> usize {
         match self {
-            EthMessage::Status(a) => a.length(),
-            EthMessage::NewBlockHashes(a) => a.length(),
-            EthMessage::NewBlock(a) => a.length(),
-            EthMessage::Transactions(a) => a.length(),
-            EthMessage::NewPooledTransactionHashes(a) => a.length(),
-            EthMessage::GetBlockHeaders(a) => a.length(),
-            EthMessage::BlockHeaders(a) => a.length(),
-            EthMessage::GetBlockBodies(a) => a.length(),
-            EthMessage::BlockBodies(a) => a.length(),
-            EthMessage::GetPooledTransactions(a) => a.length(),
-            EthMessage::PooledTransactions(a) => a.length(),
-            EthMessage::GetNodeData(a) => a.length(),
-            EthMessage::NodeData(a) => a.length(),
-            EthMessage::GetReceipts(a) => a.length(),
-            EthMessage::Receipts(a) => a.length(),
+            EthMessage::Status(status) => status.length(),
+            EthMessage::NewBlockHashes(new_block_hashes) => new_block_hashes.length(),
+            EthMessage::NewBlock(new_block) => new_block.length(),
+            EthMessage::Transactions(transactions) => transactions.length(),
+            EthMessage::NewPooledTransactionHashes(hashes) => hashes.length(),
+            EthMessage::GetBlockHeaders(request) => request.length(),
+            EthMessage::BlockHeaders(headers) => headers.length(),
+            EthMessage::GetBlockBodies(request) => request.length(),
+            EthMessage::BlockBodies(bodies) => bodies.length(),
+            EthMessage::GetPooledTransactions(request) => request.length(),
+            EthMessage::PooledTransactions(transactions) => transactions.length(),
+            EthMessage::GetNodeData(request) => request.length(),
+            EthMessage::NodeData(data) => data.length(),
+            EthMessage::GetReceipts(request) => request.length(),
+            EthMessage::Receipts(receipts) => receipts.length(),
         }
     }
     fn encode(&self, out: &mut dyn bytes::BufMut) {
         match self {
-            EthMessage::Status(a) => a.encode(out),
-            EthMessage::NewBlockHashes(a) => a.encode(out),
-            EthMessage::NewBlock(a) => a.encode(out),
-            EthMessage::Transactions(a) => a.encode(out),
-            EthMessage::NewPooledTransactionHashes(a) => a.encode(out),
-            EthMessage::GetBlockHeaders(a) => a.encode(out),
-            EthMessage::BlockHeaders(a) => a.encode(out),
-            EthMessage::GetBlockBodies(a) => a.encode(out),
-            EthMessage::BlockBodies(a) => a.encode(out),
-            EthMessage::GetPooledTransactions(a) => a.encode(out),
-            EthMessage::PooledTransactions(a) => a.encode(out),
-            EthMessage::GetNodeData(a) => a.encode(out),
-            EthMessage::NodeData(a) => a.encode(out),
-            EthMessage::GetReceipts(a) => a.encode(out),
-            EthMessage::Receipts(a) => a.encode(out),
+            EthMessage::Status(status) => status.encode(out),
+            EthMessage::NewBlockHashes(new_block_hashes) => new_block_hashes.encode(out),
+            EthMessage::NewBlock(new_block) => new_block.encode(out),
+            EthMessage::Transactions(transactions) => transactions.encode(out),
+            EthMessage::NewPooledTransactionHashes(hashes) => hashes.encode(out),
+            EthMessage::GetBlockHeaders(request) => request.encode(out),
+            EthMessage::BlockHeaders(headers) => headers.encode(out),
+            EthMessage::GetBlockBodies(request) => request.encode(out),
+            EthMessage::BlockBodies(bodies) => bodies.encode(out),
+            EthMessage::GetPooledTransactions(request) => request.encode(out),
+            EthMessage::PooledTransactions(transactions) => transactions.encode(out),
+            EthMessage::GetNodeData(request) => request.encode(out),
+            EthMessage::NodeData(data) => data.encode(out),
+            EthMessage::GetReceipts(request) => request.encode(out),
+            EthMessage::Receipts(receipts) => receipts.encode(out),
         }
     }
 }
 
-impl Decodable for EthMessage {
+/// Represents message IDs for eth protocol messages.
+#[repr(u8)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum EthMessageID {
+    Status = 0x00,
+    NewBlockHashes = 0x01,
+    Transactions = 0x02,
+    GetBlockHeaders = 0x03,
+    BlockHeaders = 0x04,
+    GetBlockBodies = 0x05,
+    BlockBodies = 0x06,
+    NewBlock = 0x07,
+    NewPooledTransactionHashes = 0x08,
+    GetPooledTransactions = 0x09,
+    PooledTransactions = 0x0a,
+    GetNodeData = 0x0d,
+    NodeData = 0x0e,
+    GetReceipts = 0x0f,
+    Receipts = 0x10,
+}
+
+impl Encodable for EthMessageID {
+    fn length(&self) -> usize {
+        1
+    }
+    fn encode(&self, out: &mut dyn bytes::BufMut) {
+        out.put_u8(*self as u8);
+    }
+}
+
+impl Decodable for EthMessageID {
     fn decode(buf: &mut &[u8]) -> Result<Self, fastrlp::DecodeError> {
-        todo!()
+        let id = buf.first().ok_or(fastrlp::DecodeError::InputTooShort)?;
+        Ok(match id {
+            0x00 => EthMessageID::Status,
+            0x01 => EthMessageID::NewBlockHashes,
+            0x02 => EthMessageID::Transactions,
+            0x03 => EthMessageID::GetBlockHeaders,
+            0x04 => EthMessageID::BlockHeaders,
+            0x05 => EthMessageID::GetBlockBodies,
+            0x06 => EthMessageID::BlockBodies,
+            0x07 => EthMessageID::NewBlock,
+            0x08 => EthMessageID::NewPooledTransactionHashes,
+            0x09 => EthMessageID::GetPooledTransactions,
+            0x0a => EthMessageID::PooledTransactions,
+            0x0d => EthMessageID::GetNodeData,
+            0x0e => EthMessageID::NodeData,
+            0x0f => EthMessageID::GetReceipts,
+            0x10 => EthMessageID::Receipts,
+            _ => return Err(fastrlp::DecodeError::Custom("Invalid message ID")),
+        })
     }
 }
 

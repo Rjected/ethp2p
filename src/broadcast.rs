@@ -1,4 +1,4 @@
-use anvil_core::eth::{transaction::TypedTransaction, block::Block};
+use anvil_core::eth::{block::Block, transaction::TypedTransaction};
 use fastrlp::{RlpDecodable, RlpEncodable};
 use ruint::Uint;
 

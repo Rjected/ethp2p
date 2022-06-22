@@ -1,4 +1,4 @@
-use anvil_core::eth::block::{Header, Block};
+use anvil_core::eth::block::{Block, Header};
 use fastrlp::{Decodable, Encodable, RlpDecodable, RlpEncodable};
 
 /// A request for a peer to return block headers starting at the requested block
