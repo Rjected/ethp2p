@@ -1,4 +1,4 @@
-use ethers::prelude::TransactionReceipt;
+use anvil_core::eth::receipt::TypedReceipt;
 use fastrlp::{RlpDecodable, RlpEncodable};
 
 /// A request for transaction receipts from the given block hashes.
@@ -9,5 +9,5 @@ pub struct GetReceipts(Vec<[u8; 32]>);
 
 /// The response to [GetReceipts](crate::GetReceipts), containing receipt lists that correspond to
 /// each block requested.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct Receipts(Vec<Vec<TransactionReceipt>>);
+#[derive(Clone, Debug, PartialEq, Eq, RlpEncodable, RlpDecodable)]
+pub struct Receipts(Vec<Vec<TypedReceipt>>);

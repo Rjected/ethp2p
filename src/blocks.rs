@@ -74,7 +74,7 @@ impl Decodable for BlockHashOrNumber {
 
 /// The response to [GetBlockHeaders](crate::GetBlockHeaders), containing headers if any headers were
 /// found.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, RlpEncodable, RlpDecodable)]
 pub struct BlockHeaders(Vec<Header>);
 
 /// A request for a peer to return block bodies for the given block hashes.
