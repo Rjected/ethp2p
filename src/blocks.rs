@@ -1,27 +1,6 @@
 use anvil_core::eth::block::{Block, Header};
 use fastrlp::{Decodable, Encodable, RlpDecodable, RlpEncodable};
 
-/// A request for a peer to return block headers starting at the requested block
-/// TODO: better comment including limit / skip / reverse rules
-#[derive(Copy, Clone, Debug, PartialEq, Eq, RlpEncodable, RlpDecodable)]
-pub struct GetBlockHeaders {
-    /// The block's number or hash that the peer should start returning headers from
-    pub start_block: BlockHashOrNumber,
-
-    /// The maximum number of headers to return
-    ///
-    /// TODO: should this be limited? does anything denote no limit? if so, this should be a more
-    /// expressive type
-    pub limit: u64,
-
-    /// The number of blocks that the node should skip while traversing headers to return
-    /// TODO: better comment
-    pub skip: u32,
-
-    /// Whether or not the headers should be returned in reverse order.
-    pub reverse: bool,
-}
-
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 /// A Block Hash or Block Number
 pub enum BlockHashOrNumber {
@@ -69,6 +48,28 @@ impl Decodable for BlockHashOrNumber {
     }
 }
 
+/// A request for a peer to return block headers starting at the requested block
+/// TODO: better comment including limit / skip / reverse rules
+#[derive(Copy, Clone, Debug, PartialEq, Eq, RlpEncodable, RlpDecodable)]
+pub struct GetBlockHeaders {
+    /// The block's number or hash that the peer should start returning headers from
+    pub start_block: BlockHashOrNumber,
+
+    /// The maximum number of headers to return
+    ///
+    /// TODO: should this be limited? does anything denote no limit? if so, this should be a more
+    /// expressive type
+    pub limit: u64,
+
+    /// The number of blocks that the node should skip while traversing headers to return
+    /// TODO: better comment
+    pub skip: u32,
+
+    /// Whether or not the headers should be returned in reverse order.
+    pub reverse: bool,
+}
+
+
 /// The response to [GetBlockHeaders](crate::GetBlockHeaders), containing headers if any headers were
 /// found.
 #[derive(Clone, Debug, PartialEq, Eq, RlpEncodable, RlpDecodable)]
@@ -85,8 +86,10 @@ pub struct BlockBodies(Vec<Block>);
 
 #[cfg(test)]
 mod test {
-    use fastrlp::Decodable;
+    use fastrlp::{Decodable, Encodable};
     use hex_literal::hex;
+
+    use crate::{message::RequestPair, GetBlockHeaders};
 
     use super::BlockHashOrNumber;
 
@@ -138,5 +141,73 @@ mod test {
         if decode_result.is_ok() {
             panic!("Decoding a number longer than 64 bits (but not exactly 32 bytes) should not decode successfully");
         }
+    }
+
+    #[test]
+    // Test vector from: https://eips.ethereum.org/EIPS/eip-2481
+    fn decode_get_block_header() {
+        let data = hex!("e8820457e4a000000000000000000000000000000000000000000000000000000000deadc0de050580");
+        let expected = RequestPair::<GetBlockHeaders> {
+            request_id: 1111,
+            message: GetBlockHeaders {
+                start_block: BlockHashOrNumber::Hash(hex!("00000000000000000000000000000000000000000000000000000000deadc0de")),
+                limit: 5,
+                skip: 5,
+                reverse: false,
+            }
+        };
+        let result = RequestPair::decode(&mut &data[..]);
+        assert_eq!(result.unwrap(), expected);
+    }
+
+    #[test]
+    // Test vector from: https://eips.ethereum.org/EIPS/eip-2481
+    fn test_encode_get_block_header() {
+        let expected = hex!("e8820457e4a000000000000000000000000000000000000000000000000000000000deadc0de050580");
+        let mut data = vec![];
+        let _request = RequestPair::<GetBlockHeaders> {
+            request_id: 1111,
+            message: GetBlockHeaders {
+                start_block: BlockHashOrNumber::Hash(hex!("00000000000000000000000000000000000000000000000000000000deadc0de")),
+                limit: 5,
+                skip: 5,
+                reverse: false,
+            }
+        }.encode(&mut data);
+        assert_eq!(data, expected);
+    }
+
+    #[test]
+    // Test vector from: https://eips.ethereum.org/EIPS/eip-2481
+    fn test_encode_get_block_header_number() {
+        let expected = hex!("ca820457c682270f050580");
+        let mut data = vec![];
+        let _request = RequestPair::<GetBlockHeaders> {
+            request_id: 1111,
+            message: GetBlockHeaders {
+                start_block: BlockHashOrNumber::Number(9999),
+                limit: 5,
+                skip: 5,
+                reverse: false,
+            }
+        }.encode(&mut data);
+        assert_eq!(data, expected);
+    }
+
+    #[test]
+    // Test vector from: https://eips.ethereum.org/EIPS/eip-2481
+    fn test_decode_get_block_header_number() {
+        let data = hex!("ca820457c682270f050580");
+        let expected = RequestPair::<GetBlockHeaders> {
+            request_id: 1111,
+            message: GetBlockHeaders {
+                start_block: BlockHashOrNumber::Number(9999),
+                limit: 5,
+                skip: 5,
+                reverse: false,
+            }
+        };
+        let result = RequestPair::decode(&mut &data[..]);
+        assert_eq!(result.unwrap(), expected);
     }
 }
