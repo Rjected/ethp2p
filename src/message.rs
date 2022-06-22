@@ -48,17 +48,39 @@ impl Encodable for EthMessage {
     fn length(&self) -> usize {
         match self {
             EthMessage::Status(a) => a.length(),
-            _ => {
-                todo!()
-            }
+            EthMessage::NewBlockHashes(a) => a.length(),
+            EthMessage::NewBlock(a) => a.length(),
+            EthMessage::Transactions(a) => a.length(),
+            EthMessage::NewPooledTransactionHashes(a) => a.length(),
+            EthMessage::GetBlockHeaders(a) => a.length(),
+            EthMessage::BlockHeaders(a) => a.length(),
+            EthMessage::GetBlockBodies(a) => a.length(),
+            EthMessage::BlockBodies(a) => a.length(),
+            EthMessage::GetPooledTransactions(a) => a.length(),
+            EthMessage::PooledTransactions(a) => a.length(),
+            EthMessage::GetNodeData(a) => a.length(),
+            EthMessage::NodeData(a) => a.length(),
+            EthMessage::GetReceipts(a) => a.length(),
+            EthMessage::Receipts(a) => a.length(),
         }
     }
     fn encode(&self, out: &mut dyn bytes::BufMut) {
         match self {
             EthMessage::Status(a) => a.encode(out),
-            _ => {
-                todo!()
-            }
+            EthMessage::NewBlockHashes(a) => a.encode(out),
+            EthMessage::NewBlock(a) => a.encode(out),
+            EthMessage::Transactions(a) => a.encode(out),
+            EthMessage::NewPooledTransactionHashes(a) => a.encode(out),
+            EthMessage::GetBlockHeaders(a) => a.encode(out),
+            EthMessage::BlockHeaders(a) => a.encode(out),
+            EthMessage::GetBlockBodies(a) => a.encode(out),
+            EthMessage::BlockBodies(a) => a.encode(out),
+            EthMessage::GetPooledTransactions(a) => a.encode(out),
+            EthMessage::PooledTransactions(a) => a.encode(out),
+            EthMessage::GetNodeData(a) => a.encode(out),
+            EthMessage::NodeData(a) => a.encode(out),
+            EthMessage::GetReceipts(a) => a.encode(out),
+            EthMessage::Receipts(a) => a.encode(out),
         }
     }
 }

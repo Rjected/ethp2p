@@ -1,4 +1,4 @@
-use ethers::types::{transaction::eip2718::TypedTransaction, Block, Signature};
+use anvil_core::eth::{transaction::TypedTransaction, block::Block};
 use fastrlp::{RlpDecodable, RlpEncodable};
 use ruint::Uint;
 
@@ -14,17 +14,16 @@ pub struct BlockHashNumber {
 }
 
 /// A new block with the current total difficult, which includes the difficulty of the returned block.
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq, RlpEncodable, RlpDecodable)]
 pub struct NewBlock {
-    pub block: Block<(TypedTransaction, Signature)>,
+    pub block: Block,
     pub td: Uint<128, 2>,
 }
 
-// TODO: Introduce SignedMessage type (with fastrlp encoding) to ethers
-
+// TODO: Introduce TypedTransaction signed message type (with fastrlp encoding) to ethers
 /// This informs peers of transactions that have appeared on the network
-#[derive(Clone, Debug, PartialEq)]
-pub struct Transactions(Vec<(TypedTransaction, Signature)>);
+#[derive(Clone, Debug, PartialEq, Eq, RlpEncodable, RlpDecodable)]
+pub struct Transactions(Vec<TypedTransaction>);
 
 /// This informs peers of transaction hashes for transactions that have appeared on the network,
 /// but have not been included in a block.

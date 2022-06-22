@@ -1,5 +1,4 @@
-use anvil_core::eth::block::Header;
-use ethers::types::{transaction::eip2718::TypedTransaction, Block, Signature};
+use anvil_core::eth::block::{Header, Block};
 use fastrlp::{Decodable, Encodable, RlpDecodable, RlpEncodable};
 
 /// A request for a peer to return block headers starting at the requested block
@@ -70,8 +69,6 @@ impl Decodable for BlockHashOrNumber {
     }
 }
 
-// TODO: header fastrlp
-
 /// The response to [GetBlockHeaders](crate::GetBlockHeaders), containing headers if any headers were
 /// found.
 #[derive(Clone, Debug, PartialEq, Eq, RlpEncodable, RlpDecodable)]
@@ -81,11 +78,10 @@ pub struct BlockHeaders(Vec<Header>);
 #[derive(Clone, Debug, PartialEq, Eq, RlpEncodable, RlpDecodable)]
 pub struct GetBlockBodies(Vec<[u8; 32]>);
 
-// TODO: again, signed message in ethers
 /// The response to [GetBlockBodies](crate::GetBlockBodies), containing the block bodies that the
 /// peer knows about if any were found.
-#[derive(Clone, Debug, PartialEq)]
-pub struct BlockBodies(Vec<Block<(TypedTransaction, Signature)>>);
+#[derive(Clone, Debug, PartialEq, Eq, RlpEncodable, RlpDecodable)]
+pub struct BlockBodies(Vec<Block>);
 
 #[cfg(test)]
 mod test {
