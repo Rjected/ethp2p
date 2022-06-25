@@ -83,7 +83,7 @@ impl From<Vec<Header>> for BlockHeaders {
 }
 
 /// A request for a peer to return block bodies for the given block hashes.
-#[derive(Clone, Debug, PartialEq, Eq, RlpEncodable, RlpDecodable)]
+#[derive(Clone, Debug, PartialEq, Eq, RlpEncodableWrapper, RlpDecodableWrapper)]
 pub struct GetBlockBodies(pub Vec<[u8; 32]>);
 
 impl From<Vec<[u8; 32]>> for GetBlockBodies {
@@ -94,7 +94,7 @@ impl From<Vec<[u8; 32]>> for GetBlockBodies {
 
 /// The response to [GetBlockBodies](crate::GetBlockBodies), containing the block bodies that the
 /// peer knows about if any were found.
-#[derive(Clone, Debug, PartialEq, Eq, RlpEncodable, RlpDecodable)]
+#[derive(Clone, Debug, PartialEq, Eq, RlpEncodableWrapper, RlpDecodableWrapper)]
 pub struct BlockBodies(pub Vec<Block>);
 
 impl From<Vec<Block>> for BlockBodies {
@@ -109,7 +109,7 @@ mod test {
     use fastrlp::{Decodable, Encodable};
     use hex_literal::hex;
 
-    use crate::{message::RequestPair, BlockHeaders, GetBlockHeaders};
+    use crate::{message::RequestPair, BlockHeaders, GetBlockHeaders, GetBlockBodies};
 
     use super::BlockHashOrNumber;
 
@@ -272,7 +272,6 @@ mod test {
                 },
             ]),
         }.encode(&mut data);
-        assert_eq!(data.len(), expected.len());
         assert_eq!(data, expected);
     }
 
@@ -307,5 +306,20 @@ mod test {
         };
         let result = RequestPair::decode(&mut &data[..]);
         assert_eq!(result.unwrap(), expected);
+    }
+
+    #[test]
+    // Test vector from: https://eips.ethereum.org/EIPS/eip-2481
+    fn test_encode_get_block_bodies() {
+        let expected = hex!("f847820457f842a000000000000000000000000000000000000000000000000000000000deadc0dea000000000000000000000000000000000000000000000000000000000feedbeef");
+        let mut data = vec![];
+        let _request = RequestPair::<GetBlockBodies> {
+            request_id: 1111,
+            message: GetBlockBodies(vec![
+                hex!("00000000000000000000000000000000000000000000000000000000deadc0de"),
+                hex!("00000000000000000000000000000000000000000000000000000000feedbeef"),
+            ]),
+        }.encode(&mut data);
+        assert_eq!(data, expected, "data: {:X?}, expected: {:X?}", data, expected);
     }
 }
