@@ -220,6 +220,31 @@ impl Decodable for EthMessageID {
     }
 }
 
+impl TryFrom<usize> for EthMessageID {
+    type Error = &'static str;
+
+    fn try_from(value: usize) -> Result<Self, Self::Error> {
+        match value {
+            0x00 => Ok(EthMessageID::Status),
+            0x01 => Ok(EthMessageID::NewBlockHashes),
+            0x02 => Ok(EthMessageID::Transactions),
+            0x03 => Ok(EthMessageID::GetBlockHeaders),
+            0x04 => Ok(EthMessageID::BlockHeaders),
+            0x05 => Ok(EthMessageID::GetBlockBodies),
+            0x06 => Ok(EthMessageID::BlockBodies),
+            0x07 => Ok(EthMessageID::NewBlock),
+            0x08 => Ok(EthMessageID::NewPooledTransactionHashes),
+            0x09 => Ok(EthMessageID::GetPooledTransactions),
+            0x0a => Ok(EthMessageID::PooledTransactions),
+            0x0d => Ok(EthMessageID::GetNodeData),
+            0x0e => Ok(EthMessageID::NodeData),
+            0x0f => Ok(EthMessageID::GetReceipts),
+            0x10 => Ok(EthMessageID::Receipts),
+            _ => Err("Invalid message ID"),
+        }
+    }
+}
+
 /// This represents a network message which has a request id
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct RequestPair<T> {

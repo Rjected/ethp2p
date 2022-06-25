@@ -19,7 +19,7 @@ pub struct PooledTransactions(pub Vec<TypedTransaction>);
 mod test {
     use std::str::FromStr;
 
-    use anvil_core::eth::transaction::{TypedTransaction, LegacyTransaction, TransactionKind};
+    use anvil_core::eth::transaction::{LegacyTransaction, TransactionKind, TypedTransaction};
     use ethers::prelude::{Bytes, Signature, U256};
     use hex_literal::hex;
 
@@ -71,26 +71,42 @@ mod test {
                     nonce: 0x8u64.into(),
                     gas_price: 0x4a817c808u64.into(),
                     gas_limit: 0x2e248u64.into(),
-                    kind: TransactionKind::Call(hex!("3535353535353535353535353535353535353535").into()),
+                    kind: TransactionKind::Call(
+                        hex!("3535353535353535353535353535353535353535").into(),
+                    ),
                     value: 0x200u64.into(),
                     input: Bytes::default(),
                     signature: Signature {
                         v: 0x25u64,
-                        r: U256::from_str("64b1702d9298fee62dfeccc57d322a463ad55ca201256d01f62b45b2e1c21c12").unwrap(),
-                        s: U256::from_str("64b1702d9298fee62dfeccc57d322a463ad55ca201256d01f62b45b2e1c21c10").unwrap(),
-                    }
+                        r: U256::from_str(
+                            "64b1702d9298fee62dfeccc57d322a463ad55ca201256d01f62b45b2e1c21c12",
+                        )
+                        .unwrap(),
+                        s: U256::from_str(
+                            "64b1702d9298fee62dfeccc57d322a463ad55ca201256d01f62b45b2e1c21c10",
+                        )
+                        .unwrap(),
+                    },
                 }),
                 TypedTransaction::Legacy(LegacyTransaction {
                     nonce: 0x09u64.into(),
                     gas_price: 0x4a817c809u64.into(),
                     gas_limit: 0x33450u64.into(),
-                    kind: TransactionKind::Call(hex!("3535353535353535353535353535353535353535").into()),
+                    kind: TransactionKind::Call(
+                        hex!("3535353535353535353535353535353535353535").into(),
+                    ),
                     value: 0x2d9u64.into(),
                     input: Bytes::default(),
                     signature: Signature {
                         v: 0x25u64,
-                        r: U256::from_str("52f8f61201b2b11a78d6e866abc9c3db2ae8631fa656bfe5cb53668255367afb").unwrap(),
-                        s: U256::from_str("52f8f61201b2b11a78d6e866abc9c3db2ae8631fa656bfe5cb53668255367afb").unwrap(),
+                        r: U256::from_str(
+                            "52f8f61201b2b11a78d6e866abc9c3db2ae8631fa656bfe5cb53668255367afb",
+                        )
+                        .unwrap(),
+                        s: U256::from_str(
+                            "52f8f61201b2b11a78d6e866abc9c3db2ae8631fa656bfe5cb53668255367afb",
+                        )
+                        .unwrap(),
                     },
                 }),
             ]),
@@ -110,26 +126,42 @@ mod test {
                     nonce: 0x8u64.into(),
                     gas_price: 0x4a817c808u64.into(),
                     gas_limit: 0x2e248u64.into(),
-                    kind: TransactionKind::Call(hex!("3535353535353535353535353535353535353535").into()),
+                    kind: TransactionKind::Call(
+                        hex!("3535353535353535353535353535353535353535").into(),
+                    ),
                     value: 0x200u64.into(),
                     input: Bytes::default(),
                     signature: Signature {
                         v: 0x25u64,
-                        r: U256::from_str("64b1702d9298fee62dfeccc57d322a463ad55ca201256d01f62b45b2e1c21c12").unwrap(),
-                        s: U256::from_str("64b1702d9298fee62dfeccc57d322a463ad55ca201256d01f62b45b2e1c21c10").unwrap(),
-                    }
+                        r: U256::from_str(
+                            "64b1702d9298fee62dfeccc57d322a463ad55ca201256d01f62b45b2e1c21c12",
+                        )
+                        .unwrap(),
+                        s: U256::from_str(
+                            "64b1702d9298fee62dfeccc57d322a463ad55ca201256d01f62b45b2e1c21c10",
+                        )
+                        .unwrap(),
+                    },
                 }),
                 TypedTransaction::Legacy(LegacyTransaction {
                     nonce: 0x09u64.into(),
                     gas_price: 0x4a817c809u64.into(),
                     gas_limit: 0x33450u64.into(),
-                    kind: TransactionKind::Call(hex!("3535353535353535353535353535353535353535").into()),
+                    kind: TransactionKind::Call(
+                        hex!("3535353535353535353535353535353535353535").into(),
+                    ),
                     value: 0x2d9u64.into(),
                     input: Bytes::default(),
                     signature: Signature {
                         v: 0x25u64,
-                        r: U256::from_str("52f8f61201b2b11a78d6e866abc9c3db2ae8631fa656bfe5cb53668255367afb").unwrap(),
-                        s: U256::from_str("52f8f61201b2b11a78d6e866abc9c3db2ae8631fa656bfe5cb53668255367afb").unwrap(),
+                        r: U256::from_str(
+                            "52f8f61201b2b11a78d6e866abc9c3db2ae8631fa656bfe5cb53668255367afb",
+                        )
+                        .unwrap(),
+                        s: U256::from_str(
+                            "52f8f61201b2b11a78d6e866abc9c3db2ae8631fa656bfe5cb53668255367afb",
+                        )
+                        .unwrap(),
                     },
                 }),
             ]),

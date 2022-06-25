@@ -1,5 +1,5 @@
 use anvil_core::eth::{block::Block, transaction::TypedTransaction};
-use fastrlp::{RlpDecodable, RlpEncodable, RlpEncodableWrapper, RlpDecodableWrapper};
+use fastrlp::{RlpDecodable, RlpDecodableWrapper, RlpEncodable, RlpEncodableWrapper};
 use ruint::Uint;
 
 /// This informs peers of new blocks that have appeared on the network.
