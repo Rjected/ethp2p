@@ -1,7 +1,4 @@
-use anvil_core::eth::{
-    block::{Block, Header},
-    transaction::TypedTransaction,
-};
+use anvil_core::eth::{block::Header, transaction::TypedTransaction};
 use fastrlp::{
     Decodable, Encodable, RlpDecodable, RlpDecodableWrapper, RlpEncodable, RlpEncodableWrapper,
 };
@@ -339,11 +336,7 @@ mod test {
             ]),
         }
         .encode(&mut data);
-        assert_eq!(
-            data, expected,
-            "data: {:X?}, expected: {:X?}",
-            data, expected
-        );
+        assert_eq!(data, expected);
     }
 
     #[test]
@@ -425,13 +418,7 @@ mod test {
             ]),
         };
         request.encode(&mut data);
-        assert_eq!(
-            data,
-            expected,
-            "data: {:X?}, expected: {:X?}",
-            hex::encode(&data),
-            hex::encode(expected)
-        );
+        assert_eq!(data, expected);
     }
 
     #[test]
