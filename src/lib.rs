@@ -2,7 +2,7 @@ mod broadcast;
 pub use broadcast::{NewBlock, NewBlockHashes, NewPooledTransactionHashes, Transactions};
 
 mod message;
-pub use message::EthMessage;
+pub use message::{EthMessage, ProtocolMessage, RequestPair};
 
 mod status;
 pub use status::Status;
