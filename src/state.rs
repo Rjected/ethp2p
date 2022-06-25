@@ -15,7 +15,7 @@ pub struct NodeData(pub Vec<bytes::Bytes>);
 mod test {
     use hex_literal::hex;
 
-    use crate::{message::RequestPair, GetNodeData};
+    use crate::{message::RequestPair, GetNodeData, NodeData};
     use fastrlp::{Decodable, Encodable};
 
     #[test]
@@ -46,6 +46,39 @@ mod test {
                 message: GetNodeData(vec![
                     hex!("00000000000000000000000000000000000000000000000000000000deadc0de"),
                     hex!("00000000000000000000000000000000000000000000000000000000feedbeef"),
+                ])
+            }
+        );
+    }
+
+    #[test]
+    // Test vector from: https://eips.ethereum.org/EIPS/eip-2481
+    fn encode_node_data() {
+        let expected = hex!("ce820457ca84deadc0de84feedbeef");
+        let mut data = vec![];
+        let request = RequestPair::<NodeData> {
+            request_id: 1111,
+            message: NodeData(vec![
+                hex!("deadc0de").as_slice().into(),
+                hex!("feedbeef").as_slice().into(),
+            ]),
+        };
+        request.encode(&mut data);
+        assert_eq!(data, expected);
+    }
+
+    #[test]
+    // Test vector from: https://eips.ethereum.org/EIPS/eip-2481
+    fn decode_node_data() {
+        let data = hex!("ce820457ca84deadc0de84feedbeef");
+        let request = RequestPair::<NodeData>::decode(&mut &data[..]).unwrap();
+        assert_eq!(
+            request,
+            RequestPair::<NodeData> {
+                request_id: 1111,
+                message: NodeData(vec![
+                    hex!("deadc0de").as_slice().into(),
+                    hex!("feedbeef").as_slice().into(),
                 ])
             }
         );
