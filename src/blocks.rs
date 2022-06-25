@@ -1,5 +1,7 @@
 use anvil_core::eth::block::{Block, Header};
-use fastrlp::{Decodable, Encodable, RlpDecodable, RlpEncodable};
+use fastrlp::{
+    Decodable, Encodable, RlpDecodable, RlpDecodableWrapper, RlpEncodable, RlpEncodableWrapper,
+};
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 /// A Block Hash or Block Number
@@ -69,27 +71,45 @@ pub struct GetBlockHeaders {
     pub reverse: bool,
 }
 
-
 /// The response to [GetBlockHeaders](crate::GetBlockHeaders), containing headers if any headers were
 /// found.
-#[derive(Clone, Debug, PartialEq, Eq, RlpEncodable, RlpDecodable)]
-pub struct BlockHeaders(Vec<Header>);
+#[derive(Clone, Debug, PartialEq, Eq, RlpEncodableWrapper, RlpDecodableWrapper)]
+pub struct BlockHeaders(pub Vec<Header>);
+
+impl From<Vec<Header>> for BlockHeaders {
+    fn from(headers: Vec<Header>) -> Self {
+        BlockHeaders(headers)
+    }
+}
 
 /// A request for a peer to return block bodies for the given block hashes.
 #[derive(Clone, Debug, PartialEq, Eq, RlpEncodable, RlpDecodable)]
-pub struct GetBlockBodies(Vec<[u8; 32]>);
+pub struct GetBlockBodies(pub Vec<[u8; 32]>);
+
+impl From<Vec<[u8; 32]>> for GetBlockBodies {
+    fn from(hashes: Vec<[u8; 32]>) -> Self {
+        GetBlockBodies(hashes)
+    }
+}
 
 /// The response to [GetBlockBodies](crate::GetBlockBodies), containing the block bodies that the
 /// peer knows about if any were found.
 #[derive(Clone, Debug, PartialEq, Eq, RlpEncodable, RlpDecodable)]
-pub struct BlockBodies(Vec<Block>);
+pub struct BlockBodies(pub Vec<Block>);
+
+impl From<Vec<Block>> for BlockBodies {
+    fn from(blocks: Vec<Block>) -> Self {
+        BlockBodies(blocks)
+    }
+}
 
 #[cfg(test)]
 mod test {
+    use anvil_core::eth::block::Header;
     use fastrlp::{Decodable, Encodable};
     use hex_literal::hex;
 
-    use crate::{message::RequestPair, GetBlockHeaders};
+    use crate::{message::RequestPair, BlockHeaders, GetBlockHeaders};
 
     use super::BlockHashOrNumber;
 
@@ -145,36 +165,45 @@ mod test {
 
     #[test]
     // Test vector from: https://eips.ethereum.org/EIPS/eip-2481
-    fn decode_get_block_header() {
-        let data = hex!("e8820457e4a000000000000000000000000000000000000000000000000000000000deadc0de050580");
-        let expected = RequestPair::<GetBlockHeaders> {
-            request_id: 1111,
-            message: GetBlockHeaders {
-                start_block: BlockHashOrNumber::Hash(hex!("00000000000000000000000000000000000000000000000000000000deadc0de")),
-                limit: 5,
-                skip: 5,
-                reverse: false,
-            }
-        };
-        let result = RequestPair::decode(&mut &data[..]);
-        assert_eq!(result.unwrap(), expected);
-    }
-
-    #[test]
-    // Test vector from: https://eips.ethereum.org/EIPS/eip-2481
     fn test_encode_get_block_header() {
-        let expected = hex!("e8820457e4a000000000000000000000000000000000000000000000000000000000deadc0de050580");
+        let expected = hex!(
+            "e8820457e4a000000000000000000000000000000000000000000000000000000000deadc0de050580"
+        );
         let mut data = vec![];
         let _request = RequestPair::<GetBlockHeaders> {
             request_id: 1111,
             message: GetBlockHeaders {
-                start_block: BlockHashOrNumber::Hash(hex!("00000000000000000000000000000000000000000000000000000000deadc0de")),
+                start_block: BlockHashOrNumber::Hash(hex!(
+                    "00000000000000000000000000000000000000000000000000000000deadc0de"
+                )),
                 limit: 5,
                 skip: 5,
                 reverse: false,
-            }
-        }.encode(&mut data);
+            },
+        }
+        .encode(&mut data);
         assert_eq!(data, expected);
+    }
+
+    #[test]
+    // Test vector from: https://eips.ethereum.org/EIPS/eip-2481
+    fn decode_get_block_header() {
+        let data = hex!(
+            "e8820457e4a000000000000000000000000000000000000000000000000000000000deadc0de050580"
+        );
+        let expected = RequestPair::<GetBlockHeaders> {
+            request_id: 1111,
+            message: GetBlockHeaders {
+                start_block: BlockHashOrNumber::Hash(hex!(
+                    "00000000000000000000000000000000000000000000000000000000deadc0de"
+                )),
+                limit: 5,
+                skip: 5,
+                reverse: false,
+            },
+        };
+        let result = RequestPair::decode(&mut &data[..]);
+        assert_eq!(result.unwrap(), expected);
     }
 
     #[test]
@@ -189,8 +218,9 @@ mod test {
                 limit: 5,
                 skip: 5,
                 reverse: false,
-            }
-        }.encode(&mut data);
+            },
+        }
+        .encode(&mut data);
         assert_eq!(data, expected);
     }
 
@@ -205,7 +235,75 @@ mod test {
                 limit: 5,
                 skip: 5,
                 reverse: false,
-            }
+            },
+        };
+        let result = RequestPair::decode(&mut &data[..]);
+        assert_eq!(result.unwrap(), expected);
+    }
+
+    #[test]
+    // Test vector from: https://eips.ethereum.org/EIPS/eip-2481
+    // Modified due to contradiction between ethereum/RLPTests and the EIP2481 test vectors - the
+    // EIP2481 test vectors incorrectly encode the nonce, see bytesShouldBeSingleByte00
+    fn test_encode_block_header() {
+        // [ (f901fa) 0x0457 = 1111, [ (f901f4) [ (f901f1) header ] ] ]
+        let expected = hex!("f901fa820457f901f4f901f1a00000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000940000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000b90100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008208ae820d0582115c8215b3821a0a827788a0000000000000000000000000000000000000000000000000000000000000000080");
+        let mut data = vec![];
+        let _request = RequestPair::<BlockHeaders> {
+            request_id: 1111,
+            message: BlockHeaders(vec![
+                Header {
+                    parent_hash: hex!("0000000000000000000000000000000000000000000000000000000000000000").into(),
+                    ommers_hash: hex!("0000000000000000000000000000000000000000000000000000000000000000").into(),
+                    beneficiary: hex!("0000000000000000000000000000000000000000").into(),
+                    state_root: hex!("0000000000000000000000000000000000000000000000000000000000000000").into(),
+                    transactions_root: hex!("0000000000000000000000000000000000000000000000000000000000000000").into(),
+                    receipts_root: hex!("0000000000000000000000000000000000000000000000000000000000000000").into(),
+                    logs_bloom: hex!("00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000").into(),
+                    difficulty: 0x8aeu64.into(),
+                    number: 0xd05u64.into(),
+                    gas_limit: 0x115cu64.into(),
+                    gas_used: 0x15b3u64.into(),
+                    timestamp: 0x1a0au64,
+                    extra_data: hex!("7788").into(),
+                    mix_hash: hex!("0000000000000000000000000000000000000000000000000000000000000000").into(),
+                    nonce: 0x0000000000000000u64.into(),
+                    base_fee_per_gas: None,
+                },
+            ]),
+        }.encode(&mut data);
+        assert_eq!(data.len(), expected.len());
+        assert_eq!(data, expected);
+    }
+
+    #[test]
+    // Test vector from: https://eips.ethereum.org/EIPS/eip-2481
+    // Modified due to contradiction between ethereum/RLPTests and the EIP2481 test vectors - the
+    // EIP2481 test vectors incorrectly encode the nonce, see bytesShouldBeSingleByte00
+    fn test_decode_block_header() {
+        let data = hex!("f901fa820457f901f4f901f1a00000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000940000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000b90100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008208ae820d0582115c8215b3821a0a827788a0000000000000000000000000000000000000000000000000000000000000000080");
+        let expected = RequestPair::<BlockHeaders> {
+            request_id: 1111,
+            message: BlockHeaders(vec![
+                Header {
+                    parent_hash: hex!("0000000000000000000000000000000000000000000000000000000000000000").into(),
+                    ommers_hash: hex!("0000000000000000000000000000000000000000000000000000000000000000").into(),
+                    beneficiary: hex!("0000000000000000000000000000000000000000").into(),
+                    state_root: hex!("0000000000000000000000000000000000000000000000000000000000000000").into(),
+                    transactions_root: hex!("0000000000000000000000000000000000000000000000000000000000000000").into(),
+                    receipts_root: hex!("0000000000000000000000000000000000000000000000000000000000000000").into(),
+                    logs_bloom: hex!("00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000").into(),
+                    difficulty: 0x8aeu64.into(),
+                    number: 0xd05u64.into(),
+                    gas_limit: 0x115cu64.into(),
+                    gas_used: 0x15b3u64.into(),
+                    timestamp: 0x1a0au64,
+                    extra_data: hex!("7788").into(),
+                    mix_hash: hex!("0000000000000000000000000000000000000000000000000000000000000000").into(),
+                    nonce: 0x0000000000000000u64.into(),
+                    base_fee_per_gas: None,
+                },
+            ]),
         };
         let result = RequestPair::decode(&mut &data[..]);
         assert_eq!(result.unwrap(), expected);

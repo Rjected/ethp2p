@@ -2,7 +2,6 @@ use ethereum_forkid::ForkId;
 use fastrlp::{RlpDecodable, RlpEncodable};
 use foundry_config::Chain;
 use ruint::Uint;
-use serde::{Deserialize, Serialize};
 
 /// The status message is used in the eth protocol handshake to ensure that peers are on the same
 /// network and are following the same fork.
@@ -11,7 +10,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// When performing a handshake, the total difficulty is not guaranteed to correspond to the block
 /// hash. This information should be treated as untrusted.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, RlpEncodable, RlpDecodable)]
+#[derive(Clone, Debug, PartialEq, Eq, RlpEncodable, RlpDecodable)]
 pub struct Status {
     /// The current protocol version. For example, peers running eth/65 would have a version of 65.
     pub version: u8,
@@ -35,44 +34,7 @@ pub struct Status {
     /// checksum](https://en.wikipedia.org/wiki/Cyclic_redundancy_check#CRC-32_algorithm) for
     /// identifying the peer's fork as defined by
     /// [EIP-2124](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2124.md).
-    #[serde(
-        serialize_with = "serialize_forkid",
-        deserialize_with = "deserialize_forkid"
-    )]
     pub forkid: ForkId,
-}
-
-// let _one_status_message = StatusMessage {
-//     protocol_version: EthProtocolVersion::Eth66 as usize,
-//     network_id: 1,
-//     total_difficulty: akula::models::U256::from_str_radix("36206751599115524359527", 10)
-//         .unwrap(),
-//     best_hash: H256::from_str(
-//         "0xfeb27336ca7923f8fab3bd617fcb6e75841538f71c1bcfc267d7838489d9e13d",
-//     )
-//     .unwrap(),
-//     genesis_hash: H256::from_str(
-//         "0xd4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3",
-//     )
-//     .unwrap(),
-//     fork_id: ForkId {
-//         hash: ForkHash([0xb7, 0x15, 0x07, 0x7d]),
-//         next: 0,
-//     },
-// };
-
-fn serialize_forkid<S>(forkid: &ForkId, serializer: S) -> Result<S::Ok, S::Error>
-where
-    S: serde::Serializer,
-{
-    todo!()
-}
-
-fn deserialize_forkid<'de, D>(deserializer: D) -> Result<ForkId, D::Error>
-where
-    D: serde::Deserializer<'de>,
-{
-    todo!()
 }
 
 #[cfg(test)]
@@ -81,7 +43,7 @@ mod tests {
     use fastrlp::Encodable;
     use foundry_config::Chain;
     use hex_literal::hex;
-    use ruint::{uint, Uint};
+    use ruint::Uint;
 
     use crate::{EthVersion, Status};
 

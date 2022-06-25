@@ -3,7 +3,7 @@ use fastrlp::{RlpDecodable, RlpEncodable};
 
 /// A list of transaction hashes that the peer would like transaction bodies for.
 #[derive(Clone, Debug, PartialEq, Eq, RlpEncodable, RlpDecodable)]
-pub struct GetPooledTransactions(Vec<[u8; 32]>);
+pub struct GetPooledTransactions(pub Vec<[u8; 32]>);
 
 /// The response to [GetPooledTransactions](crate::GetPooledTransactions), containing the
 /// transaction bodies associated with the requested hashes.
@@ -13,4 +13,4 @@ pub struct GetPooledTransactions(Vec<[u8; 32]>);
 /// corresponds to a requested hash. Hashes may need to be re-requested if the bodies are not
 /// included in the response.
 #[derive(Clone, Debug, PartialEq, Eq, RlpEncodable, RlpDecodable)]
-pub struct PooledTransactions(Vec<TypedTransaction>);
+pub struct PooledTransactions(pub Vec<TypedTransaction>);

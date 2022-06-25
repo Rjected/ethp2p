@@ -4,7 +4,7 @@ use ruint::Uint;
 
 /// This informs peers of new blocks that have appeared on the network.
 #[derive(Clone, Debug, PartialEq, Eq, RlpEncodable, RlpDecodable)]
-pub struct NewBlockHashes(Vec<BlockHashNumber>);
+pub struct NewBlockHashes(pub Vec<BlockHashNumber>);
 
 /// A block hash and a block number.
 #[derive(Clone, Debug, PartialEq, Eq, RlpEncodable, RlpDecodable)]
@@ -23,9 +23,9 @@ pub struct NewBlock {
 // TODO: Introduce TypedTransaction signed message type (with fastrlp encoding) to ethers
 /// This informs peers of transactions that have appeared on the network
 #[derive(Clone, Debug, PartialEq, Eq, RlpEncodable, RlpDecodable)]
-pub struct Transactions(Vec<TypedTransaction>);
+pub struct Transactions(pub Vec<TypedTransaction>);
 
 /// This informs peers of transaction hashes for transactions that have appeared on the network,
 /// but have not been included in a block.
 #[derive(Clone, Debug, PartialEq, Eq, RlpEncodable, RlpDecodable)]
-pub struct NewPooledTransactionHashes(Vec<[u8; 32]>);
+pub struct NewPooledTransactionHashes(pub Vec<[u8; 32]>);

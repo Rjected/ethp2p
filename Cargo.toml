@@ -18,6 +18,7 @@ ethereum-forkid = { git = "https://github.com/rust-ethereum/forkid" }
 
 [dev-dependencies]
 hex-literal = "0.3.4"
+hex = "0.4.3"
 
 [patch.crates-io]
 fastrlp = { git = "https://github.com/rjected/fastrlp", branch = "implement-ethereum-types", features = ["std", "derive", "ethereum-types"] }
