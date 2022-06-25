@@ -1,9 +1,9 @@
 use anvil_core::eth::{block::Block, transaction::TypedTransaction};
-use fastrlp::{RlpDecodable, RlpEncodable};
+use fastrlp::{RlpDecodable, RlpEncodable, RlpEncodableWrapper, RlpDecodableWrapper};
 use ruint::Uint;
 
 /// This informs peers of new blocks that have appeared on the network.
-#[derive(Clone, Debug, PartialEq, Eq, RlpEncodable, RlpDecodable)]
+#[derive(Clone, Debug, PartialEq, Eq, RlpEncodableWrapper, RlpDecodableWrapper)]
 pub struct NewBlockHashes(pub Vec<BlockHashNumber>);
 
 /// A block hash and a block number.
@@ -13,7 +13,8 @@ pub struct BlockHashNumber {
     pub number: u64,
 }
 
-/// A new block with the current total difficult, which includes the difficulty of the returned block.
+/// A new block with the current total difficultt, which includes the difficulty of the returned
+/// block.
 #[derive(Clone, Debug, PartialEq, Eq, RlpEncodable, RlpDecodable)]
 pub struct NewBlock {
     pub block: Block,
@@ -22,10 +23,10 @@ pub struct NewBlock {
 
 // TODO: Introduce TypedTransaction signed message type (with fastrlp encoding) to ethers
 /// This informs peers of transactions that have appeared on the network
-#[derive(Clone, Debug, PartialEq, Eq, RlpEncodable, RlpDecodable)]
+#[derive(Clone, Debug, PartialEq, Eq, RlpEncodableWrapper, RlpDecodableWrapper)]
 pub struct Transactions(pub Vec<TypedTransaction>);
 
 /// This informs peers of transaction hashes for transactions that have appeared on the network,
 /// but have not been included in a block.
-#[derive(Clone, Debug, PartialEq, Eq, RlpEncodable, RlpDecodable)]
+#[derive(Clone, Debug, PartialEq, Eq, RlpEncodableWrapper, RlpDecodableWrapper)]
 pub struct NewPooledTransactionHashes(pub Vec<[u8; 32]>);
