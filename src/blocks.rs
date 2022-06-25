@@ -1,7 +1,11 @@
-use anvil_core::eth::block::{Block, Header};
+use anvil_core::eth::{
+    block::{Block, Header},
+    transaction::TypedTransaction,
+};
 use fastrlp::{
     Decodable, Encodable, RlpDecodable, RlpDecodableWrapper, RlpEncodable, RlpEncodableWrapper,
 };
+use serde::{Deserialize, Serialize};
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 /// A Block Hash or Block Number
@@ -92,26 +96,39 @@ impl From<Vec<[u8; 32]>> for GetBlockBodies {
     }
 }
 
+/// A response to [GetBlockBodies](crate::GetBlockBodies), containing bodies if any bodies were found.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, RlpEncodable, RlpDecodable)]
+pub struct BlockBody {
+    pub transactions: Vec<TypedTransaction>,
+    pub ommers: Vec<Header>,
+}
+
 /// The response to [GetBlockBodies](crate::GetBlockBodies), containing the block bodies that the
 /// peer knows about if any were found.
 #[derive(Clone, Debug, PartialEq, Eq, RlpEncodableWrapper, RlpDecodableWrapper)]
-pub struct BlockBodies(pub Vec<Block>);
+pub struct BlockBodies(pub Vec<BlockBody>);
 
-impl From<Vec<Block>> for BlockBodies {
-    fn from(blocks: Vec<Block>) -> Self {
-        BlockBodies(blocks)
+impl From<Vec<BlockBody>> for BlockBodies {
+    fn from(bodies: Vec<BlockBody>) -> Self {
+        BlockBodies(bodies)
     }
 }
 
 #[cfg(test)]
 mod test {
-    use anvil_core::eth::block::Header;
+    use std::str::FromStr;
+
+    use anvil_core::eth::{
+        block::Header,
+        transaction::{LegacyTransaction, TransactionKind, TypedTransaction},
+    };
+    use ethers::prelude::{Bytes, Signature, U256};
     use fastrlp::{Decodable, Encodable};
     use hex_literal::hex;
 
-    use crate::{message::RequestPair, BlockHeaders, GetBlockHeaders, GetBlockBodies};
+    use crate::{message::RequestPair, BlockBodies, BlockHeaders, GetBlockBodies, GetBlockHeaders};
 
-    use super::BlockHashOrNumber;
+    use super::{BlockBody, BlockHashOrNumber};
 
     #[test]
     fn decode_hash() {
@@ -244,7 +261,8 @@ mod test {
     #[test]
     // Test vector from: https://eips.ethereum.org/EIPS/eip-2481
     // Modified due to contradiction between ethereum/RLPTests and the EIP2481 test vectors - the
-    // EIP2481 test vectors incorrectly encode the nonce, see bytesShouldBeSingleByte00
+    // EIP2481 test vectors incorrectly encode the nonce in the header, see
+    // bytesShouldBeSingleByte00
     fn test_encode_block_header() {
         // [ (f901fa) 0x0457 = 1111, [ (f901f4) [ (f901f1) header ] ] ]
         let expected = hex!("f901fa820457f901f4f901f1a00000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000940000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000b90100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008208ae820d0582115c8215b3821a0a827788a0000000000000000000000000000000000000000000000000000000000000000080");
@@ -319,7 +337,165 @@ mod test {
                 hex!("00000000000000000000000000000000000000000000000000000000deadc0de"),
                 hex!("00000000000000000000000000000000000000000000000000000000feedbeef"),
             ]),
-        }.encode(&mut data);
-        assert_eq!(data, expected, "data: {:X?}, expected: {:X?}", data, expected);
+        }
+        .encode(&mut data);
+        assert_eq!(
+            data, expected,
+            "data: {:X?}, expected: {:X?}",
+            data, expected
+        );
+    }
+
+    #[test]
+    // Test vector from: https://eips.ethereum.org/EIPS/eip-2481
+    fn test_decode_get_block_bodies() {
+        let data = hex!("f847820457f842a000000000000000000000000000000000000000000000000000000000deadc0dea000000000000000000000000000000000000000000000000000000000feedbeef");
+        let expected = RequestPair::<GetBlockBodies> {
+            request_id: 1111,
+            message: GetBlockBodies(vec![
+                hex!("00000000000000000000000000000000000000000000000000000000deadc0de"),
+                hex!("00000000000000000000000000000000000000000000000000000000feedbeef"),
+            ]),
+        };
+        let result = RequestPair::decode(&mut &data[..]);
+        assert_eq!(result.unwrap(), expected);
+    }
+
+    #[test]
+    // Test vector from: https://eips.ethereum.org/EIPS/eip-2481
+    // Modified due to contradiction between ethereum/RLPTests and the EIP2481 test vectors - the
+    // EIP2481 test vectors incorrectly encode the nonce in the header, see
+    // bytesShouldBeSingleByte00
+    fn test_encode_block_bodies() {
+        let expected = hex!("f902d4820457f902cef902cbf8d2f867088504a817c8088302e2489435353535353535353535353535353535353535358202008025a064b1702d9298fee62dfeccc57d322a463ad55ca201256d01f62b45b2e1c21c12a064b1702d9298fee62dfeccc57d322a463ad55ca201256d01f62b45b2e1c21c10f867098504a817c809830334509435353535353535353535353535353535353535358202d98025a052f8f61201b2b11a78d6e866abc9c3db2ae8631fa656bfe5cb53668255367afba052f8f61201b2b11a78d6e866abc9c3db2ae8631fa656bfe5cb53668255367afbf901f4f901f1a00000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000940000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000b90100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008208ae820d0582115c8215b3821a0a827788a0000000000000000000000000000000000000000000000000000000000000000080");
+        let mut data = vec![];
+        let request = RequestPair::<BlockBodies> {
+            request_id: 1111,
+            message: BlockBodies(vec![
+                BlockBody {
+                    transactions: vec![
+                        TypedTransaction::Legacy(LegacyTransaction {
+                            nonce: 0x8u64.into(),
+                            gas_price: 0x4a817c808u64.into(),
+                            gas_limit: 0x2e248u64.into(),
+                            kind: TransactionKind::Call(hex!("3535353535353535353535353535353535353535").into()),
+                            value: 0x200u64.into(),
+                            input: Bytes::default(),
+                            signature: Signature {
+                                v: 0x25u64,
+                                r: U256::from_str("64b1702d9298fee62dfeccc57d322a463ad55ca201256d01f62b45b2e1c21c12").unwrap(),
+                                s: U256::from_str("64b1702d9298fee62dfeccc57d322a463ad55ca201256d01f62b45b2e1c21c10").unwrap(),
+                            }
+                        }),
+                        TypedTransaction::Legacy(LegacyTransaction {
+                            nonce: 0x9u64.into(),
+                            gas_price: 0x4a817c809u64.into(),
+                            gas_limit: 0x33450u64.into(),
+                            kind: TransactionKind::Call(hex!("3535353535353535353535353535353535353535").into()),
+                            value: 0x2d9u64.into(),
+                            input: Bytes::default(),
+                            signature: Signature {
+                                v: 0x25u64,
+                                r: U256::from_str("52f8f61201b2b11a78d6e866abc9c3db2ae8631fa656bfe5cb53668255367afb").unwrap(),
+                                s: U256::from_str("52f8f61201b2b11a78d6e866abc9c3db2ae8631fa656bfe5cb53668255367afb").unwrap(),
+                            },
+                        }),
+                    ],
+                    ommers: vec![
+                        Header {
+                            parent_hash: hex!("0000000000000000000000000000000000000000000000000000000000000000").into(),
+                            ommers_hash: hex!("0000000000000000000000000000000000000000000000000000000000000000").into(),
+                            beneficiary: hex!("0000000000000000000000000000000000000000").into(),
+                            state_root: hex!("0000000000000000000000000000000000000000000000000000000000000000").into(),
+                            transactions_root: hex!("0000000000000000000000000000000000000000000000000000000000000000").into(),
+                            receipts_root: hex!("0000000000000000000000000000000000000000000000000000000000000000").into(),
+                            logs_bloom: hex!("00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000").into(),
+                            difficulty: 0x8aeu64.into(),
+                            number: 0xd05u64.into(),
+                            gas_limit: 0x115cu64.into(),
+                            gas_used: 0x15b3u64.into(),
+                            timestamp: 0x1a0au64,
+                            extra_data: hex!("7788").into(),
+                            mix_hash: hex!("0000000000000000000000000000000000000000000000000000000000000000").into(),
+                            nonce: 0x0000000000000000u64.into(),
+                            base_fee_per_gas: None,
+                        },
+                    ],
+                }
+            ]),
+        };
+        request.encode(&mut data);
+        assert_eq!(
+            data,
+            expected,
+            "data: {:X?}, expected: {:X?}",
+            hex::encode(&data),
+            hex::encode(expected)
+        );
+    }
+
+    #[test]
+    // Test vector from: https://eips.ethereum.org/EIPS/eip-2481
+    // Modified due to contradiction between ethereum/RLPTests and the EIP2481 test vectors - The
+    // EIP2481 test vectors incorrectly encode the nonce in the header, see bytesShouldBeSingleByte00
+    fn test_decode_block_bodies() {
+        let data = hex!("f902d4820457f902cef902cbf8d2f867088504a817c8088302e2489435353535353535353535353535353535353535358202008025a064b1702d9298fee62dfeccc57d322a463ad55ca201256d01f62b45b2e1c21c12a064b1702d9298fee62dfeccc57d322a463ad55ca201256d01f62b45b2e1c21c10f867098504a817c809830334509435353535353535353535353535353535353535358202d98025a052f8f61201b2b11a78d6e866abc9c3db2ae8631fa656bfe5cb53668255367afba052f8f61201b2b11a78d6e866abc9c3db2ae8631fa656bfe5cb53668255367afbf901f4f901f1a00000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000940000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000b90100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008208ae820d0582115c8215b3821a0a827788a0000000000000000000000000000000000000000000000000000000000000000080");
+        let expected = RequestPair::<BlockBodies> {
+            request_id: 1111,
+            message: BlockBodies(vec![
+                BlockBody {
+                    transactions: vec![
+                        TypedTransaction::Legacy(LegacyTransaction {
+                            nonce: 0x8u64.into(),
+                            gas_price: 0x4a817c808u64.into(),
+                            gas_limit: 0x2e248u64.into(),
+                            kind: TransactionKind::Call(hex!("3535353535353535353535353535353535353535").into()),
+                            value: 0x200u64.into(),
+                            input: Bytes::default(),
+                            signature: Signature {
+                                v: 0x25u64,
+                                r: U256::from_str("64b1702d9298fee62dfeccc57d322a463ad55ca201256d01f62b45b2e1c21c12").unwrap(),
+                                s: U256::from_str("64b1702d9298fee62dfeccc57d322a463ad55ca201256d01f62b45b2e1c21c10").unwrap(),
+                            }
+                        }),
+                        TypedTransaction::Legacy(LegacyTransaction {
+                            nonce: 0x9u64.into(),
+                            gas_price: 0x4a817c809u64.into(),
+                            gas_limit: 0x33450u64.into(),
+                            kind: TransactionKind::Call(hex!("3535353535353535353535353535353535353535").into()),
+                            value: 0x2d9u64.into(),
+                            input: Bytes::default(),
+                            signature: Signature {
+                                v: 0x25u64,
+                                r: U256::from_str("52f8f61201b2b11a78d6e866abc9c3db2ae8631fa656bfe5cb53668255367afb").unwrap(),
+                                s: U256::from_str("52f8f61201b2b11a78d6e866abc9c3db2ae8631fa656bfe5cb53668255367afb").unwrap(),
+                            },
+                        }),
+                    ],
+                    ommers: vec![
+                        Header {
+                            parent_hash: hex!("0000000000000000000000000000000000000000000000000000000000000000").into(),
+                            ommers_hash: hex!("0000000000000000000000000000000000000000000000000000000000000000").into(),
+                            beneficiary: hex!("0000000000000000000000000000000000000000").into(),
+                            state_root: hex!("0000000000000000000000000000000000000000000000000000000000000000").into(),
+                            transactions_root: hex!("0000000000000000000000000000000000000000000000000000000000000000").into(),
+                            receipts_root: hex!("0000000000000000000000000000000000000000000000000000000000000000").into(),
+                            logs_bloom: hex!("00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000").into(),
+                            difficulty: 0x8aeu64.into(),
+                            number: 0xd05u64.into(),
+                            gas_limit: 0x115cu64.into(),
+                            gas_used: 0x15b3u64.into(),
+                            timestamp: 0x1a0au64,
+                            extra_data: hex!("7788").into(),
+                            mix_hash: hex!("0000000000000000000000000000000000000000000000000000000000000000").into(),
+                            nonce: 0x0000000000000000u64.into(),
+                            base_fee_per_gas: None,
+                        },
+                    ],
+                }
+            ]),
+        };
+        let result = RequestPair::decode(&mut &data[..]).unwrap();
+        assert_eq!(result, expected);
     }
 }
