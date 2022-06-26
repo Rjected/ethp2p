@@ -136,7 +136,7 @@ pub enum EthMessage {
 
 impl EthMessage {
     /// Returns the message's ID.
-    fn message_id(&self) -> EthMessageID {
+    pub fn message_id(&self) -> EthMessageID {
         match self {
             EthMessage::Status(_) => EthMessageID::Status,
             EthMessage::NewBlockHashes(_) => EthMessageID::NewBlockHashes,
