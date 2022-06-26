@@ -90,6 +90,15 @@ impl Decodable for ProtocolMessage {
     }
 }
 
+impl From<EthMessage> for ProtocolMessage {
+    fn from(message: EthMessage) -> Self {
+        ProtocolMessage {
+            message_type: message.message_id(),
+            message,
+        }
+    }
+}
+
 // TODO: determine whats up with this enum variant size warning
 
 /// Represents a message in the eth wire protocol, versions 65, 66 and 67.
@@ -123,6 +132,29 @@ pub enum EthMessage {
     NodeData(RequestPair<NodeData>),
     GetReceipts(RequestPair<GetReceipts>),
     Receipts(RequestPair<Receipts>),
+}
+
+impl EthMessage {
+    /// Returns the message's ID.
+    fn message_id(&self) -> EthMessageID {
+        match self {
+            EthMessage::Status(_) => EthMessageID::Status,
+            EthMessage::NewBlockHashes(_) => EthMessageID::NewBlockHashes,
+            EthMessage::NewBlock(_) => EthMessageID::NewBlock,
+            EthMessage::Transactions(_) => EthMessageID::Transactions,
+            EthMessage::NewPooledTransactionHashes(_) => EthMessageID::NewPooledTransactionHashes,
+            EthMessage::GetBlockHeaders(_) => EthMessageID::GetBlockHeaders,
+            EthMessage::BlockHeaders(_) => EthMessageID::BlockHeaders,
+            EthMessage::GetBlockBodies(_) => EthMessageID::GetBlockBodies,
+            EthMessage::BlockBodies(_) => EthMessageID::BlockBodies,
+            EthMessage::GetPooledTransactions(_) => EthMessageID::GetPooledTransactions,
+            EthMessage::PooledTransactions(_) => EthMessageID::PooledTransactions,
+            EthMessage::GetNodeData(_) => EthMessageID::GetNodeData,
+            EthMessage::NodeData(_) => EthMessageID::NodeData,
+            EthMessage::GetReceipts(_) => EthMessageID::GetReceipts,
+            EthMessage::Receipts(_) => EthMessageID::Receipts,
+        }
+    }
 }
 
 impl Encodable for EthMessage {
