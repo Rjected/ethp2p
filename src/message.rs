@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 
-use fastrlp::{Decodable, Encodable, RlpDecodable, length_of_length, Header};
+use fastrlp::{Decodable, Encodable, length_of_length, Header};
 
 use crate::{
     blocks::{BlockBodies, BlockHeaders, GetBlockBodies},
@@ -329,6 +329,7 @@ where
     T: Decodable,
 {
     fn decode(buf: &mut &[u8]) -> Result<Self, fastrlp::DecodeError> {
+        let _header = Header::decode(buf)?;
         Ok(Self {
             request_id: u64::decode(buf)?,
             message: T::decode(buf)?,
