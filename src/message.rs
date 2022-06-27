@@ -17,7 +17,11 @@ pub struct ProtocolMessage {
 
 impl ProtocolMessage {
     /// Create a new ProtocolMessage from a message type and message rlp bytes.
-    pub fn decode_message(message_type: EthMessageID, buf: &mut &[u8]) -> Result<Self, fastrlp::DecodeError> {
+    pub fn decode_message(
+        message_type: EthMessageID,
+        buf: &mut &[u8],
+    ) -> Result<Self, fastrlp::DecodeError> {
+        // TODO: should this be a Decodable impl on EthMessage?
         let message = match message_type {
             EthMessageID::Status => EthMessage::Status(Status::decode(buf)?),
             EthMessageID::NewBlockHashes => {
