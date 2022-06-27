@@ -10,7 +10,7 @@ use ruint::Uint;
 ///
 /// When performing a handshake, the total difficulty is not guaranteed to correspond to the block
 /// hash. This information should be treated as untrusted.
-#[derive(Clone, Debug, PartialEq, Eq, RlpEncodable, RlpDecodable)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, RlpEncodable, RlpDecodable)]
 pub struct Status {
     /// The current protocol version. For example, peers running eth/65 would have a version of 65.
     pub version: u8,
