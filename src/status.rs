@@ -40,7 +40,8 @@ pub struct Status {
 #[cfg(test)]
 mod tests {
     use ethereum_forkid::{ForkHash, ForkId};
-    use fastrlp::Encodable;
+    use ethers::prelude::Chain as NamedChain;
+    use fastrlp::{Decodable, Encodable};
     use foundry_config::Chain;
     use hex_literal::hex;
     use ruint::Uint;
@@ -48,11 +49,12 @@ mod tests {
     use crate::{EthVersion, Status};
 
     #[test]
-    fn create_status_message() {
+    fn encode_eth_status_message() {
+        let expected = hex!("f85643018a07aac59dabcdd74bc567a0feb27336ca7923f8fab3bd617fcb6e75841538f71c1bcfc267d7838489d9e13da0d4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3c684b715077d80");
         let status = Status {
             version: EthVersion::Eth67 as u8,
             // ethers versions arent the same due to patches, so using Id here
-            chain: Chain::Id(1),
+            chain: Chain::Named(NamedChain::Mainnet),
             total_difficulty: Uint::from(36206751599115524359527u128),
             blockhash: hex!("feb27336ca7923f8fab3bd617fcb6e75841538f71c1bcfc267d7838489d9e13d"),
             genesis: hex!("d4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3"),
@@ -64,6 +66,63 @@ mod tests {
 
         let mut rlp_status = vec![];
         status.encode(&mut rlp_status);
-        println!("here is the rlp status: {:X?}", rlp_status);
+        assert_eq!(rlp_status, expected);
+    }
+
+    #[test]
+    fn decode_eth_status_message() {
+        let data = hex!("f85643018a07aac59dabcdd74bc567a0feb27336ca7923f8fab3bd617fcb6e75841538f71c1bcfc267d7838489d9e13da0d4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3c684b715077d80");
+        let expected = Status {
+            version: EthVersion::Eth67 as u8,
+            // ethers versions arent the same due to patches, so using Id here
+            chain: Chain::Named(NamedChain::Mainnet),
+            total_difficulty: Uint::from(36206751599115524359527u128),
+            blockhash: hex!("feb27336ca7923f8fab3bd617fcb6e75841538f71c1bcfc267d7838489d9e13d"),
+            genesis: hex!("d4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3"),
+            forkid: ForkId {
+                hash: ForkHash([0xb7, 0x15, 0x07, 0x7d]),
+                next: 0,
+            },
+        };
+        let status = Status::decode(&mut &data[..]).unwrap();
+        assert_eq!(status, expected);
+    }
+
+    #[test]
+    fn encode_network_status_message() {
+        let expected = hex!("f850423884024190faa0f8514c4680ef27700751b08f37645309ce65a449616a3ea966bf39dd935bb27ba00d21840abff46b96c84b2ac9e10e4f5cdaeb5693cb665db62a2f3b02d2d57b5bc6845d43d2fd80");
+        let status = Status {
+            version: EthVersion::Eth66 as u8,
+            chain: Chain::Named(NamedChain::BinanceSmartChain),
+            total_difficulty: Uint::from(37851386u64),
+            blockhash: hex!("f8514c4680ef27700751b08f37645309ce65a449616a3ea966bf39dd935bb27b"),
+            genesis: hex!("0d21840abff46b96c84b2ac9e10e4f5cdaeb5693cb665db62a2f3b02d2d57b5b"),
+            forkid: ForkId {
+                hash: ForkHash([0x5d, 0x43, 0xd2, 0xfd]),
+                next: 0,
+            },
+        };
+
+        let mut rlp_status = vec![];
+        status.encode(&mut rlp_status);
+        assert_eq!(rlp_status, expected);
+    }
+
+    #[test]
+    fn decode_network_status_message() {
+        let data = hex!("f850423884024190faa0f8514c4680ef27700751b08f37645309ce65a449616a3ea966bf39dd935bb27ba00d21840abff46b96c84b2ac9e10e4f5cdaeb5693cb665db62a2f3b02d2d57b5bc6845d43d2fd80");
+        let expected = Status {
+            version: EthVersion::Eth66 as u8,
+            chain: Chain::Named(NamedChain::BinanceSmartChain),
+            total_difficulty: Uint::from(37851386u64),
+            blockhash: hex!("f8514c4680ef27700751b08f37645309ce65a449616a3ea966bf39dd935bb27b"),
+            genesis: hex!("0d21840abff46b96c84b2ac9e10e4f5cdaeb5693cb665db62a2f3b02d2d57b5b"),
+            forkid: ForkId {
+                hash: ForkHash([0x5d, 0x43, 0xd2, 0xfd]),
+                next: 0,
+            },
+        };
+        let status = Status::decode(&mut &data[..]).unwrap();
+        assert_eq!(status, expected);
     }
 }
