@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 
-use fastrlp::{Decodable, Encodable, RlpDecodable, RlpEncodable};
+use fastrlp::{Decodable, Encodable, RlpDecodable, length_of_length, Header};
 
 use crate::{
     blocks::{BlockBodies, BlockHeaders, GetBlockBodies},
@@ -301,45 +301,37 @@ pub struct RequestPair<T> {
 /// Allows request messages with request ids to be serialized as RLP.
 impl<T> Encodable for RequestPair<T>
 where
-    T: Encodable + Clone,
+    T: Encodable,
 {
     fn length(&self) -> usize {
-        self.request_id.length() + self.message.length()
+        let mut length = 0;
+        length += self.request_id.length();
+        length += self.message.length();
+        length += length_of_length(length);
+        length
     }
 
     fn encode(&self, out: &mut dyn fastrlp::BufMut) {
-        #[derive(RlpEncodable)]
-        struct Pair<Z: Encodable> {
-            pub request_id: u64,
-            pub message: Z,
-        }
-
-        let encodable_pair = Pair {
-            request_id: self.request_id,
-            message: self.message.clone(),
+        let header = Header {
+            list: true,
+            payload_length: self.request_id.length() + self.message.length(),
         };
 
-        encodable_pair.encode(out);
+        header.encode(out);
+        self.request_id.encode(out);
+        self.message.encode(out);
     }
 }
 
 /// Allows request messages with request ids to be deserialized as RLP.
 impl<T> Decodable for RequestPair<T>
 where
-    T: Decodable + Clone,
+    T: Decodable,
 {
     fn decode(buf: &mut &[u8]) -> Result<Self, fastrlp::DecodeError> {
-        #[derive(RlpDecodable)]
-        struct Pair<Z: Decodable> {
-            pub request_id: u64,
-            pub message: Z,
-        }
-
-        let pair: Pair<T> = Pair::decode(buf)?;
-
         Ok(Self {
-            request_id: pair.request_id,
-            message: pair.message,
+            request_id: u64::decode(buf)?,
+            message: T::decode(buf)?,
         })
     }
 }
@@ -382,14 +374,15 @@ mod test {
 
     #[test]
     fn request_pair_decode() {
-        let mut raw_pair = &hex!("c5820539c105")[..];
+        let raw_pair = &hex!("c5820539c105")[..];
 
         let expected = RequestPair {
             request_id: 1337,
             message: vec![5u8],
         };
 
-        let got = RequestPair::<Vec<u8>>::decode(&mut raw_pair).unwrap();
+        let got = RequestPair::<Vec<u8>>::decode(&mut &*raw_pair).unwrap();
+        assert_eq!(expected.length(), raw_pair.len());
         assert_eq!(expected, got);
     }
 }
