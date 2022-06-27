@@ -15,23 +15,9 @@ pub struct ProtocolMessage {
     pub message: EthMessage,
 }
 
-/// Encodes the protocol message into bytes.
-/// The message type is encoded as a single byte and prepended to the message.
-impl Encodable for ProtocolMessage {
-    fn length(&self) -> usize {
-        self.message_type.length() + self.message.length()
-    }
-    fn encode(&self, out: &mut dyn bytes::BufMut) {
-        self.message_type.encode(out);
-        self.message.encode(out);
-    }
-}
-
-/// Decodes a protocol message from bytes, using the first byte to determine the message type.
-/// This decodes eth/66 request ids for each message type.
-impl Decodable for ProtocolMessage {
-    fn decode(buf: &mut &[u8]) -> Result<Self, fastrlp::DecodeError> {
-        let message_type = EthMessageID::decode(buf)?;
+impl ProtocolMessage {
+    /// Create a new ProtocolMessage from a message type and message rlp bytes.
+    pub fn decode_message(message_type: EthMessageID, buf: &mut &[u8]) -> Result<Self, fastrlp::DecodeError> {
         let message = match message_type {
             EthMessageID::Status => EthMessage::Status(Status::decode(buf)?),
             EthMessageID::NewBlockHashes => {
@@ -87,6 +73,27 @@ impl Decodable for ProtocolMessage {
             message_type,
             message,
         })
+    }
+}
+
+/// Encodes the protocol message into bytes.
+/// The message type is encoded as a single byte and prepended to the message.
+impl Encodable for ProtocolMessage {
+    fn length(&self) -> usize {
+        self.message_type.length() + self.message.length()
+    }
+    fn encode(&self, out: &mut dyn bytes::BufMut) {
+        self.message_type.encode(out);
+        self.message.encode(out);
+    }
+}
+
+/// Decodes a protocol message from bytes, using the first byte to determine the message type.
+/// This decodes eth/66 request ids for each message type.
+impl Decodable for ProtocolMessage {
+    fn decode(buf: &mut &[u8]) -> Result<Self, fastrlp::DecodeError> {
+        let message_type = EthMessageID::decode(buf)?;
+        Self::decode_message(message_type, buf)
     }
 }
 
