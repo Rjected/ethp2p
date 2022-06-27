@@ -14,7 +14,7 @@ serde = "1.0.137"
 serde_json = "1.0.81"
 fastrlp = { version = "0.1.0", features = ["alloc", "derive", "std"] }
 ruint = { git = "https://github.com/recmo/uint", features = ["fastrlp", "serde"] }
-ethereum-forkid = { git = "https://github.com/rust-ethereum/forkid" }
+ethereum-forkid = "0.8.0"
 
 [dev-dependencies]
 hex-literal = "0.3.4"
