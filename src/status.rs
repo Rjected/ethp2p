@@ -20,9 +20,7 @@ pub struct Status {
     pub chain: Chain,
 
     /// Total difficulty of the best chain.
-    /// The ethereum difficulty is unlikely to exceed 128 bits, but is currently over 64 bits, so
-    /// this is represented as a 128 bit integer.
-    pub total_difficulty: Uint<128, 2>,
+    pub total_difficulty: Uint<256, 4>,
 
     /// The highest difficulty block hash the peer has seen
     pub blockhash: [u8; 32],
@@ -39,6 +37,8 @@ pub struct Status {
 
 #[cfg(test)]
 mod tests {
+    use std::str::FromStr;
+
     use ethereum_forkid::{ForkHash, ForkId};
     use ethers::prelude::Chain as NamedChain;
     use fastrlp::{Decodable, Encodable};
@@ -119,6 +119,24 @@ mod tests {
             genesis: hex!("0d21840abff46b96c84b2ac9e10e4f5cdaeb5693cb665db62a2f3b02d2d57b5b"),
             forkid: ForkId {
                 hash: ForkHash([0x5d, 0x43, 0xd2, 0xfd]),
+                next: 0,
+            },
+        };
+        let status = Status::decode(&mut &data[..]).unwrap();
+        assert_eq!(status, expected);
+    }
+
+    #[test]
+    fn decode_another_network_status_message() {
+        let data = hex!("f86142820834936d68fcffffffffffffffffffffffffdeab81b8a0523e8163a6d620a4cc152c547a05f28a03fec91a2a615194cb86df9731372c0ca06499dccdc7c7def3ebb1ce4c6ee27ec6bd02aee570625ca391919faf77ef27bdc6841a67ccd880");
+        let expected = Status {
+            version: EthVersion::Eth66 as u8,
+            chain: Chain::Id(2100),
+            total_difficulty: Uint::from_str("0x000000000000000000000000006d68fcffffffffffffffffffffffffdeab81b8").unwrap(),
+            blockhash: hex!("523e8163a6d620a4cc152c547a05f28a03fec91a2a615194cb86df9731372c0c"),
+            genesis: hex!("6499dccdc7c7def3ebb1ce4c6ee27ec6bd02aee570625ca391919faf77ef27bd"),
+            forkid: ForkId {
+                hash: ForkHash([0x1a, 0x67, 0xcc, 0xd8]),
                 next: 0,
             },
         };
