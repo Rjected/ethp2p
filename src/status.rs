@@ -1,3 +1,4 @@
+use std::fmt::{Display, Debug};
 use ethereum_forkid::ForkId;
 use fastrlp::{RlpDecodable, RlpEncodable};
 use foundry_config::Chain;
@@ -10,7 +11,7 @@ use ruint::Uint;
 ///
 /// When performing a handshake, the total difficulty is not guaranteed to correspond to the block
 /// hash. This information should be treated as untrusted.
-#[derive(Copy, Clone, Debug, PartialEq, Eq, RlpEncodable, RlpDecodable)]
+#[derive(Copy, Clone, PartialEq, Eq, RlpEncodable, RlpDecodable)]
 pub struct Status {
     /// The current protocol version. For example, peers running eth/65 would have a version of 65.
     pub version: u8,
@@ -33,6 +34,55 @@ pub struct Status {
     /// identifying the peer's fork as defined by
     /// [EIP-2124](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2124.md).
     pub forkid: ForkId,
+}
+
+// TODO: Determine if it's worth wrapping or aliasing [u8; 32] across these types, to help derive
+// traits like this rather than having to manually implement them.
+impl Display for Status {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let hexed_blockhash = hex::encode(&self.blockhash);
+        let hexed_genesis = hex::encode(&self.genesis);
+        write!(
+            f,
+            "Status {{ version: {}, chain: {}, total_difficulty: {}, blockhash: {}, genesis: {}, forkid: {:X?} }}",
+            self.version,
+            self.chain,
+            self.total_difficulty,
+            hexed_blockhash,
+            hexed_genesis,
+            self.forkid
+        )
+    }
+}
+
+impl Debug for Status {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let hexed_blockhash = hex::encode(&self.blockhash);
+        let hexed_genesis = hex::encode(&self.genesis);
+        if f.alternate() {
+            write!(
+                f,
+                "Status {{\n\tversion: {:?},\n\tchain: {:?},\n\ttotal_difficulty: {:?},\n\tblockhash: {},\n\tgenesis: {},\n\tforkid: {:X?}\n}}",
+                self.version,
+                self.chain,
+                self.total_difficulty,
+                hexed_blockhash,
+                hexed_genesis,
+                self.forkid
+            )
+        } else {
+            write!(
+                f,
+                "Status {{ version: {:?}, chain: {:?}, total_difficulty: {:?}, blockhash: {}, genesis: {}, forkid: {:X?} }}",
+                self.version,
+                self.chain,
+                self.total_difficulty,
+                hexed_blockhash,
+                hexed_genesis,
+                self.forkid
+            )
+        }
+    }
 }
 
 #[cfg(test)]
@@ -141,6 +191,9 @@ mod tests {
             },
         };
         let status = Status::decode(&mut &data[..]).unwrap();
+        println!("{}", status);
+        println!("{:?}", status);
+        println!("{:#?}", status);
         assert_eq!(status, expected);
     }
 }
