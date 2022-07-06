@@ -194,9 +194,6 @@ mod tests {
             },
         };
         let status = Status::decode(&mut &data[..]).unwrap();
-        println!("{}", status);
-        println!("{:?}", status);
-        println!("{:#?}", status);
         assert_eq!(status, expected);
     }
 }
