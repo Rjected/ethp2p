@@ -112,7 +112,7 @@ impl From<EthMessage> for ProtocolMessage {
 
 // TODO: determine whats up with this enum variant size warning
 
-/// Represents a message in the eth wire protocol, versions 65, 66 and 67.
+/// Represents a message in the eth wire protocol, versions 66 and 67.
 ///
 /// The ethereum wire protocol is a set of messages that are broadcasted to the network in two
 /// styles:
@@ -120,7 +120,7 @@ impl From<EthMessage> for ProtocolMessage {
 ///  * A message that is broadcast to the network, without a corresponding request.
 ///
 ///  The newer eth/66 is an efficiency upgrade on top of eth/65, introducing a request id to correlate
-///  request-response message pairs.
+///  request-response message pairs. This allows for request multiplexing.
 #[derive(Clone, Debug, PartialEq)]
 pub enum EthMessage {
     // Status is required for the protocol handshake
