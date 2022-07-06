@@ -1,5 +1,7 @@
 mod broadcast;
-pub use broadcast::{NewBlock, NewBlockHashes, NewPooledTransactionHashes, Transactions, BlockHashNumber};
+pub use broadcast::{
+    BlockHashNumber, NewBlock, NewBlockHashes, NewPooledTransactionHashes, Transactions,
+};
 
 mod message;
 pub use message::{EthMessage, EthMessageID, ProtocolMessage, RequestPair};
@@ -8,7 +10,7 @@ mod status;
 pub use status::Status;
 
 mod blocks;
-pub use blocks::{BlockBodies, BlockHeaders, GetBlockBodies, GetBlockHeaders, BlockHashOrNumber};
+pub use blocks::{BlockBodies, BlockHashOrNumber, BlockHeaders, GetBlockBodies, GetBlockHeaders};
 
 mod transactions;
 pub use transactions::{GetPooledTransactions, PooledTransactions};
@@ -30,7 +32,7 @@ macro_rules! message_from_impl {
                 EthMessage::$variant(t)
             }
         }
-    }
+    };
 }
 
 message_from_impl!(Status, Status);

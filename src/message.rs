@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 
-use fastrlp::{Decodable, Encodable, length_of_length, Header};
+use fastrlp::{length_of_length, Decodable, Encodable, Header};
 
 use crate::{
     blocks::{BlockBodies, BlockHeaders, GetBlockBodies},

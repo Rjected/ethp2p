@@ -1,8 +1,8 @@
-use std::fmt::{Display, Debug};
 use ethereum_forkid::ForkId;
 use fastrlp::{RlpDecodable, RlpEncodable};
 use foundry_config::Chain;
 use ruint::Uint;
+use std::fmt::{Debug, Display};
 
 /// The status message is used in the eth protocol handshake to ensure that peers are on the same
 /// network and are following the same fork.
@@ -182,7 +182,10 @@ mod tests {
         let expected = Status {
             version: EthVersion::Eth66 as u8,
             chain: Chain::Id(2100),
-            total_difficulty: Uint::from_str("0x000000000000000000000000006d68fcffffffffffffffffffffffffdeab81b8").unwrap(),
+            total_difficulty: Uint::from_str(
+                "0x000000000000000000000000006d68fcffffffffffffffffffffffffdeab81b8",
+            )
+            .unwrap(),
             blockhash: hex!("523e8163a6d620a4cc152c547a05f28a03fec91a2a615194cb86df9731372c0c"),
             genesis: hex!("6499dccdc7c7def3ebb1ce4c6ee27ec6bd02aee570625ca391919faf77ef27bd"),
             forkid: ForkId {
