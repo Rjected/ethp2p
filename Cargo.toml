@@ -25,3 +25,7 @@ hex-literal = "0.3.4"
 [patch."https://github.com/foundry-rs/foundry"]
 anvil-core = { git = "https://github.com/rjected/foundry", branch = "fastrlp" }
 foundry-config = { git = "https://github.com/rjected/foundry", branch = "fastrlp" }
+
+# due to https://github.com/foundry-rs/foundry/pull/1979
+[patch.crates-io]
+revm = { git = "https://github.com/bluealloy/revm", package = "revm"  }
