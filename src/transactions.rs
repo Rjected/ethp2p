@@ -5,7 +5,7 @@ use fastrlp::{RlpDecodableWrapper, RlpEncodableWrapper};
 #[derive(Clone, Debug, PartialEq, Eq, RlpEncodableWrapper, RlpDecodableWrapper)]
 pub struct GetPooledTransactions(
     /// The transaction hashes to request transaction bodies for.
-    pub Vec<[u8; 32]>
+    pub Vec<[u8; 32]>,
 );
 
 impl<T> From<Vec<T>> for GetPooledTransactions
@@ -27,7 +27,7 @@ where
 #[derive(Clone, Debug, PartialEq, Eq, RlpEncodableWrapper, RlpDecodableWrapper)]
 pub struct PooledTransactions(
     /// The transaction bodies, each of which should correspond to a requested hash.
-    pub Vec<TypedTransaction>
+    pub Vec<TypedTransaction>,
 );
 
 impl PooledTransactions {

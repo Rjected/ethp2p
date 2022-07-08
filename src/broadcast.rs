@@ -7,7 +7,7 @@ use ruint::Uint;
 pub struct NewBlockHashes(
     /// New block hashes and the block number for each blockhash.
     /// Clients should request blocks using a [`GetBlockBodies`](crate::GetBlockBodies) message.
-    pub Vec<BlockHashNumber>
+    pub Vec<BlockHashNumber>,
 );
 
 /// A block hash _and_ a block number.
@@ -34,7 +34,7 @@ pub struct NewBlock {
 #[derive(Clone, Debug, PartialEq, Eq, RlpEncodableWrapper, RlpDecodableWrapper)]
 pub struct Transactions(
     /// New transactions for the peer to include in its mempool.
-    pub Vec<TypedTransaction>
+    pub Vec<TypedTransaction>,
 );
 
 impl From<Vec<TypedTransaction>> for Transactions {
@@ -56,5 +56,5 @@ pub struct NewPooledTransactionHashes(
     /// Transaction hashes for new transactions that have appeared on the network.
     /// Clients should request the transactions with the given hashes using a
     /// [`GetPooledTransactions`](crate::GetPooledTransactions) message.
-    pub Vec<[u8; 32]>
+    pub Vec<[u8; 32]>,
 );

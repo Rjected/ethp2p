@@ -11,9 +11,7 @@ env:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
     - name: Install nightly toolchain
@@ -27,3 +25,25 @@ jobs:
       run: cargo build --verbose
     - name: Run tests
       run: cargo test --verbose
+
+  lint:
+    name: lints
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+      - name: Install toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          # nightly regression https://github.com/rust-lang/rust/issues/95267
+          toolchain: nightly-2022-03-20
+          profile: minimal
+          components: rustfmt, clippy
+          override: true
+      - uses: Swatinem/rust-cache@v1
+        with:
+          cache-on-failure: true
+      - name: cargo fmt
+        run: cargo +nightly-2022-03-20 fmt --all -- --check
+      - name: cargo clippy
+        run: cargo +nightly-2022-03-20 clippy --all-features -- -D warnings

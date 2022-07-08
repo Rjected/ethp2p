@@ -1,4 +1,7 @@
-use anvil_core::eth::{block::{Header, Block}, transaction::TypedTransaction};
+use anvil_core::eth::{
+    block::{Block, Header},
+    transaction::TypedTransaction,
+};
 use fastrlp::{
     Decodable, Encodable, RlpDecodable, RlpDecodableWrapper, RlpEncodable, RlpEncodableWrapper,
 };
@@ -82,7 +85,7 @@ pub struct GetBlockHeaders {
 #[derive(Clone, Debug, PartialEq, Eq, RlpEncodableWrapper, RlpDecodableWrapper)]
 pub struct BlockHeaders(
     /// The requested headers.
-    pub Vec<Header>
+    pub Vec<Header>,
 );
 
 impl From<Vec<Header>> for BlockHeaders {
@@ -95,7 +98,7 @@ impl From<Vec<Header>> for BlockHeaders {
 #[derive(Clone, Debug, PartialEq, Eq, RlpEncodableWrapper, RlpDecodableWrapper)]
 pub struct GetBlockBodies(
     /// The block hashes to request bodies for.
-    pub Vec<[u8; 32]>
+    pub Vec<[u8; 32]>,
 );
 
 impl From<Vec<[u8; 32]>> for GetBlockBodies {
@@ -127,7 +130,7 @@ impl BlockBody {
 #[derive(Clone, Debug, PartialEq, Eq, RlpEncodableWrapper, RlpDecodableWrapper)]
 pub struct BlockBodies(
     /// The requested block bodies, each of which should correspond to a hash in the request.
-    pub Vec<BlockBody>
+    pub Vec<BlockBody>,
 );
 
 impl From<Vec<BlockBody>> for BlockBodies {
