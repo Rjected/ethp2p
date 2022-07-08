@@ -3,7 +3,10 @@ use fastrlp::{RlpDecodableWrapper, RlpEncodableWrapper};
 
 /// A list of transaction hashes that the peer would like transaction bodies for.
 #[derive(Clone, Debug, PartialEq, Eq, RlpEncodableWrapper, RlpDecodableWrapper)]
-pub struct GetPooledTransactions(pub Vec<[u8; 32]>);
+pub struct GetPooledTransactions(
+    /// The transaction hashes to request transaction bodies for.
+    pub Vec<[u8; 32]>
+);
 
 impl<T> From<Vec<T>> for GetPooledTransactions
 where
@@ -14,15 +17,18 @@ where
     }
 }
 
-/// The response to [GetPooledTransactions](crate::GetPooledTransactions), containing the
-/// transaction bodies associated with the requested hashes.
+/// The response to [`GetPooledTransactions`], containing the transaction bodies associated with
+/// the requested hashes.
 ///
 /// This response may not contain all bodies requested, but the bodies should be in the same order
 /// as the request's hashes. Hashes may be skipped, and the client should ensure that each body
 /// corresponds to a requested hash. Hashes may need to be re-requested if the bodies are not
 /// included in the response.
 #[derive(Clone, Debug, PartialEq, Eq, RlpEncodableWrapper, RlpDecodableWrapper)]
-pub struct PooledTransactions(pub Vec<TypedTransaction>);
+pub struct PooledTransactions(
+    /// The transaction bodies, each of which should correspond to a requested hash.
+    pub Vec<TypedTransaction>
+);
 
 impl PooledTransactions {
     /// Given a list of hashes, split the hashes into those that match a transaction in the

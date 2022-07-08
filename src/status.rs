@@ -13,7 +13,8 @@ use std::fmt::{Debug, Display};
 /// hash. This information should be treated as untrusted.
 #[derive(Copy, Clone, PartialEq, Eq, RlpEncodable, RlpDecodable)]
 pub struct Status {
-    /// The current protocol version. For example, peers running eth/65 would have a version of 65.
+    /// The current protocol version. For example, peers running `eth/66` would have a version of
+    /// 66.
     pub version: u8,
 
     /// The chain id, as introduced in
@@ -26,13 +27,14 @@ pub struct Status {
     /// The highest difficulty block hash the peer has seen
     pub blockhash: [u8; 32],
 
-    /// The genesis hash of the peer's chain
+    /// The genesis hash of the peer's chain.
     pub genesis: [u8; 32],
 
     /// The fork identifier, a [CRC32
     /// checksum](https://en.wikipedia.org/wiki/Cyclic_redundancy_check#CRC-32_algorithm) for
     /// identifying the peer's fork as defined by
     /// [EIP-2124](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2124.md).
+    /// This was added in [`eth/64`](https://eips.ethereum.org/EIPS/eip-2364)
     pub forkid: ForkId,
 }
 

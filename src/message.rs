@@ -10,6 +10,7 @@ use crate::{
 };
 
 #[derive(Clone, Debug, PartialEq)]
+/// An `eth` protocol message, containing a message ID and payload.
 pub struct ProtocolMessage {
     pub message_type: EthMessageID,
     pub message: EthMessage,
@@ -21,7 +22,6 @@ impl ProtocolMessage {
         message_type: EthMessageID,
         buf: &mut &[u8],
     ) -> Result<Self, fastrlp::DecodeError> {
-        // TODO: should this be a Decodable impl on EthMessage?
         let message = match message_type {
             EthMessageID::Status => EthMessage::Status(Status::decode(buf)?),
             EthMessageID::NewBlockHashes => {
@@ -93,7 +93,7 @@ impl Encodable for ProtocolMessage {
 }
 
 /// Decodes a protocol message from bytes, using the first byte to determine the message type.
-/// This decodes eth/66 request ids for each message type.
+/// This decodes `eth/66` request ids for each message type.
 impl Decodable for ProtocolMessage {
     fn decode(buf: &mut &[u8]) -> Result<Self, fastrlp::DecodeError> {
         let message_type = EthMessageID::decode(buf)?;
@@ -116,11 +116,12 @@ impl From<EthMessage> for ProtocolMessage {
 ///
 /// The ethereum wire protocol is a set of messages that are broadcasted to the network in two
 /// styles:
-///  * A request message sent by a peer (such as `GetPooledTransactions`), and an associated response message (such as `PooledTransactions`).
+///  * A request message sent by a peer (such as [`GetPooledTransactions`]), and an associated
+///  response message (such as [`PooledTransactions`]).
 ///  * A message that is broadcast to the network, without a corresponding request.
 ///
-///  The newer eth/66 is an efficiency upgrade on top of eth/65, introducing a request id to correlate
-///  request-response message pairs. This allows for request multiplexing.
+///  The newer `eth/66` is an efficiency upgrade on top of `eth/65`, introducing a request id to
+///  correlate request-response message pairs. This allows for request multiplexing.
 #[derive(Clone, Debug, PartialEq)]
 pub enum EthMessage {
     // Status is required for the protocol handshake
@@ -288,7 +289,9 @@ impl TryFrom<usize> for EthMessageID {
     }
 }
 
-/// This represents a network message which has a request id
+/// This is used for all request-response style `eth` protocol messages.
+/// This can represent either a request or a response, since both include a message payload and
+/// request id.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct RequestPair<T> {
     /// id for the contained request or response message
@@ -298,7 +301,7 @@ pub struct RequestPair<T> {
     pub message: T,
 }
 
-/// Allows request messages with request ids to be serialized as RLP.
+/// Allows messages with request ids to be serialized into RLP bytes.
 impl<T> Encodable for RequestPair<T>
 where
     T: Encodable,
@@ -323,7 +326,7 @@ where
     }
 }
 
-/// Allows request messages with request ids to be deserialized as RLP.
+/// Allows messages with request ids to be deserialized into RLP bytes.
 impl<T> Decodable for RequestPair<T>
 where
     T: Decodable,

@@ -1,11 +1,11 @@
-use anvil_core::eth::{block::Header, transaction::TypedTransaction};
+use anvil_core::eth::{block::{Header, Block}, transaction::TypedTransaction};
 use fastrlp::{
     Decodable, Encodable, RlpDecodable, RlpDecodableWrapper, RlpEncodable, RlpEncodableWrapper,
 };
 use serde::{Deserialize, Serialize};
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
-/// A Block Hash or Block Number
+/// Either a block hash _or_ a block number
 pub enum BlockHashOrNumber {
     /// A block hash
     Hash([u8; 32]),
@@ -51,31 +51,39 @@ impl Decodable for BlockHashOrNumber {
     }
 }
 
-/// A request for a peer to return block headers starting at the requested block
-/// TODO: better comment including limit / skip / reverse rules
+/// A request for a peer to return block headers starting at the requested block.
+/// The peer must return at most [`limit`](#structfield.limit) headers.
+/// If the [`reverse`](#structfield.reverse) field is `true`, the headers will be returned starting
+/// at [`start_block`](#structfield.start_block), traversing towards the genesis block.
+/// Otherwise, headers will be returned starting at [`start_block`](#structfield.start_block),
+/// traversing towards the latest block.
+///
+/// If the [`skip`](#structfield.skip) field is non-zero, the peer must skip that amount of headers
+/// in the the direction specified by [`reverse`](#structfield.reverse).
 #[derive(Copy, Clone, Debug, PartialEq, Eq, RlpEncodable, RlpDecodable)]
 pub struct GetBlockHeaders {
-    /// The block's number or hash that the peer should start returning headers from
+    /// The block number or hash that the peer should start returning headers from.
     pub start_block: BlockHashOrNumber,
 
-    /// The maximum number of headers to return
-    ///
-    /// TODO: should this be limited? does anything denote no limit? if so, this should be a more
-    /// expressive type
+    /// The maximum number of headers to return.
     pub limit: u64,
 
-    /// The number of blocks that the node should skip while traversing headers to return
-    /// TODO: better comment
+    /// The number of blocks that the node should skip while traversing and returning headers.
+    /// A skip value of zero denotes that the peer should return contiguous heaaders, starting from
+    /// [`start_block`](#structfield.start_block) and returning at most [`limit`](#structfield.limit)
+    /// headers.
     pub skip: u32,
 
     /// Whether or not the headers should be returned in reverse order.
     pub reverse: bool,
 }
 
-/// The response to [GetBlockHeaders](crate::GetBlockHeaders), containing headers if any headers were
-/// found.
+/// The response to [`GetBlockHeaders`], containing headers if any headers were found.
 #[derive(Clone, Debug, PartialEq, Eq, RlpEncodableWrapper, RlpDecodableWrapper)]
-pub struct BlockHeaders(pub Vec<Header>);
+pub struct BlockHeaders(
+    /// The requested headers.
+    pub Vec<Header>
+);
 
 impl From<Vec<Header>> for BlockHeaders {
     fn from(headers: Vec<Header>) -> Self {
@@ -85,7 +93,10 @@ impl From<Vec<Header>> for BlockHeaders {
 
 /// A request for a peer to return block bodies for the given block hashes.
 #[derive(Clone, Debug, PartialEq, Eq, RlpEncodableWrapper, RlpDecodableWrapper)]
-pub struct GetBlockBodies(pub Vec<[u8; 32]>);
+pub struct GetBlockBodies(
+    /// The block hashes to request bodies for.
+    pub Vec<[u8; 32]>
+);
 
 impl From<Vec<[u8; 32]>> for GetBlockBodies {
     fn from(hashes: Vec<[u8; 32]>) -> Self {
@@ -93,17 +104,31 @@ impl From<Vec<[u8; 32]>> for GetBlockBodies {
     }
 }
 
-/// A response to [GetBlockBodies](crate::GetBlockBodies), containing bodies if any bodies were found.
+/// A response to [`GetBlockBodies`], containing bodies if any bodies were found.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, RlpEncodable, RlpDecodable)]
 pub struct BlockBody {
     pub transactions: Vec<TypedTransaction>,
     pub ommers: Vec<Header>,
 }
 
-/// The response to [GetBlockBodies](crate::GetBlockBodies), containing the block bodies that the
-/// peer knows about if any were found.
+impl BlockBody {
+    /// Create a [`Block`] from the body and its header.
+    pub fn create_block(&self, header: &Header) -> Block {
+        Block {
+            header: header.clone(),
+            transactions: self.transactions.clone(),
+            ommers: self.ommers.clone(),
+        }
+    }
+}
+
+/// The response to [`GetBlockBodies`], containing the block bodies that the peer knows about if
+/// any were found.
 #[derive(Clone, Debug, PartialEq, Eq, RlpEncodableWrapper, RlpDecodableWrapper)]
-pub struct BlockBodies(pub Vec<BlockBody>);
+pub struct BlockBodies(
+    /// The requested block bodies, each of which should correspond to a hash in the request.
+    pub Vec<BlockBody>
+);
 
 impl From<Vec<BlockBody>> for BlockBodies {
     fn from(bodies: Vec<BlockBody>) -> Self {

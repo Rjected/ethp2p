@@ -3,12 +3,18 @@ use fastrlp::{RlpDecodableWrapper, RlpEncodableWrapper};
 
 /// A request for transaction receipts from the given block hashes.
 #[derive(Clone, Debug, PartialEq, Eq, RlpEncodableWrapper, RlpDecodableWrapper)]
-pub struct GetReceipts(pub Vec<[u8; 32]>);
+pub struct GetReceipts(
+    /// The block hashes to request receipts for.
+    pub Vec<[u8; 32]>,
+);
 
-/// The response to [GetReceipts](crate::GetReceipts), containing receipt lists that correspond to
-/// each block requested.
+/// The response to [`GetReceipts`], containing receipt lists that correspond to each block
+/// requested.
 #[derive(Clone, Debug, PartialEq, Eq, RlpEncodableWrapper, RlpDecodableWrapper)]
-pub struct Receipts(pub Vec<Vec<TypedReceipt>>);
+pub struct Receipts(
+    /// Each receipt hash should correspond to a block hash in the request.
+    pub Vec<Vec<TypedReceipt>>,
+);
 
 #[cfg(test)]
 mod test {

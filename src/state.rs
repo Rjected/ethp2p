@@ -1,13 +1,16 @@
 use fastrlp::{RlpDecodableWrapper, RlpEncodableWrapper};
 
 /// A request for state tree nodes corresponding to the given hashes.
+/// This message was removed in `eth/67`, only clients running `eth/66` or earlier will respond to
+/// this message.
 #[derive(Clone, Debug, PartialEq, Eq, RlpEncodableWrapper, RlpDecodableWrapper)]
 pub struct GetNodeData(pub Vec<[u8; 32]>);
 
-/// The response to [GetNodeData](crate::GetNodeData), containing the state tree nodes or contract
-/// bytecode corresponding to the requested hashes.
+/// The response to [`GetNodeData`], containing the state tree nodes or contract bytecode
+/// corresponding to the requested hashes.
 ///
 /// Not all nodes are guaranteed to be returned by the peer.
+/// This message was removed in `eth/67`.
 #[derive(Clone, Debug, PartialEq, Eq, RlpEncodableWrapper, RlpDecodableWrapper)]
 pub struct NodeData(pub Vec<bytes::Bytes>);
 
