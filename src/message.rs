@@ -9,7 +9,7 @@ use crate::{
     Receipts, Status,
 };
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 /// An `eth` protocol message, containing a message ID and payload.
 pub struct ProtocolMessage {
     pub message_type: EthMessageID,
@@ -27,7 +27,7 @@ impl ProtocolMessage {
             EthMessageID::NewBlockHashes => {
                 EthMessage::NewBlockHashes(NewBlockHashes::decode(buf)?)
             }
-            EthMessageID::NewBlock => EthMessage::NewBlock(NewBlock::decode(buf)?),
+            EthMessageID::NewBlock => EthMessage::NewBlock(Box::new(NewBlock::decode(buf)?)),
             EthMessageID::Transactions => EthMessage::Transactions(Transactions::decode(buf)?),
             EthMessageID::NewPooledTransactionHashes => {
                 EthMessage::NewPooledTransactionHashes(NewPooledTransactionHashes::decode(buf)?)
@@ -122,14 +122,14 @@ impl From<EthMessage> for ProtocolMessage {
 ///
 ///  The newer `eth/66` is an efficiency upgrade on top of `eth/65`, introducing a request id to
 ///  correlate request-response message pairs. This allows for request multiplexing.
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum EthMessage {
     // Status is required for the protocol handshake
     Status(Status),
 
     // The following messages are broadcast to the network
     NewBlockHashes(NewBlockHashes),
-    NewBlock(NewBlock),
+    NewBlock(Box<NewBlock>),
     Transactions(Transactions),
     NewPooledTransactionHashes(NewPooledTransactionHashes),
 

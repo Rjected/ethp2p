@@ -8,7 +8,11 @@
 [crates-badge]: https://img.shields.io/crates/v/ethp2p.svg
 [crates-url]: https://crates.io/crates/ethp2p
 
-P2P types and encoding for Ethereum
+P2P types and utilities for working with [`eth`](https://github.com/ethereum/devp2p) protocol
+messages.
+
+`ethp2p` is built on [`anvil`](https://github.com/foundry-rs/foundry/tree/master/anvil) types, and
+implements [`fastrlp`](https://github.com/vorot93/fastrlp) traits for RLP encoding and decoding.
 
 ## Usage
 
@@ -20,5 +24,3 @@ ethp2p = "0.1"
 ```
 
 *Compiler support: requires rustc 1.62+*
-
-## Examples

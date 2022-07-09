@@ -37,7 +37,7 @@ macro_rules! message_from_impl {
 
 message_from_impl!(Status, Status);
 message_from_impl!(NewBlockHashes, NewBlockHashes);
-message_from_impl!(NewBlock, NewBlock);
+message_from_impl!(Box<NewBlock>, NewBlock);
 message_from_impl!(Transactions, Transactions);
 message_from_impl!(NewPooledTransactionHashes, NewPooledTransactionHashes);
 message_from_impl!(RequestPair<GetBlockHeaders>, GetBlockHeaders);
