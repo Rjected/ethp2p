@@ -61,11 +61,11 @@ pub struct NewPooledTransactionHashes(
 
 #[cfg(test)]
 mod test {
-    use anvil_core::eth::transaction::{TypedTransaction, LegacyTransaction, TransactionKind};
-    use ethers::prelude::Signature;
-    use hex_literal::hex;
-    use fastrlp::{Decodable, Encodable};
     use crate::Transactions;
+    use anvil_core::eth::transaction::{LegacyTransaction, TransactionKind, TypedTransaction};
+    use ethers::prelude::Signature;
+    use fastrlp::{Decodable, Encodable};
+    use hex_literal::hex;
 
     #[test]
     fn decode_transactions_network() {
