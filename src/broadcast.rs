@@ -71,9 +71,15 @@ pub struct NewPooledTransactionHashes(
     pub Vec<[u8; 32]>,
 );
 
+impl From<Vec<[u8; 32]>> for NewPooledTransactionHashes {
+    fn from(v: Vec<[u8; 32]>) -> Self {
+        NewPooledTransactionHashes(v)
+    }
+}
+
 #[cfg(test)]
 mod test {
-    use crate::{BlockHashNumber, NewBlockHashes, Transactions};
+    use crate::{BlockHashNumber, NewBlockHashes, Transactions, NewPooledTransactionHashes};
     use anvil_core::eth::transaction::{LegacyTransaction, TransactionKind, TypedTransaction};
     use ethers::prelude::Signature;
     use fastrlp::{Decodable, Encodable};
@@ -194,6 +200,31 @@ mod test {
         .into();
         let mut encoded = vec![];
         hashes.encode(&mut encoded);
+        let expected_str = hex::encode(expected);
+        let encoded_str = hex::encode(encoded);
+        assert_eq!(expected_str, encoded_str);
+    }
+
+    #[test]
+    fn decode_new_pooled_transactions_simple() {
+        let data = hex!("f842a0fd3f0d4cb96a496ee7b77a238e48435600ce3337ce8f0309b7b57e91bfce89d6a0fd3f0d4cb96a496ee7b77a238e48435600ce3337ce8f0309b7b57e91bfce89d7");
+        let expected: NewPooledTransactionHashes = vec![
+            hex!("fd3f0d4cb96a496ee7b77a238e48435600ce3337ce8f0309b7b57e91bfce89d6"),
+            hex!("fd3f0d4cb96a496ee7b77a238e48435600ce3337ce8f0309b7b57e91bfce89d7"),
+        ].into();
+        let decoded = NewPooledTransactionHashes::decode(&mut &data[..]).unwrap();
+        assert_eq!(expected, decoded);
+    }
+
+    #[test]
+    fn encode_new_pooled_tranactions() {
+        let expected = hex!("f842a0fd3f0d4cb96a496ee7b77a238e48435600ce3337ce8f0309b7b57e91bfce89d6a0fd3f0d4cb96a496ee7b77a238e48435600ce3337ce8f0309b7b57e91bfce89d7");
+        let tx_hashes: NewPooledTransactionHashes = vec![
+            hex!("fd3f0d4cb96a496ee7b77a238e48435600ce3337ce8f0309b7b57e91bfce89d6"),
+            hex!("fd3f0d4cb96a496ee7b77a238e48435600ce3337ce8f0309b7b57e91bfce89d7"),
+        ].into();
+        let mut encoded = vec![];
+        tx_hashes.encode(&mut encoded);
         let expected_str = hex::encode(expected);
         let encoded_str = hex::encode(encoded);
         assert_eq!(expected_str, encoded_str);
