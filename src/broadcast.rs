@@ -79,7 +79,7 @@ impl From<Vec<[u8; 32]>> for NewPooledTransactionHashes {
 
 #[cfg(test)]
 mod test {
-    use crate::{BlockHashNumber, NewBlockHashes, Transactions, NewPooledTransactionHashes};
+    use crate::{BlockHashNumber, NewBlockHashes, NewPooledTransactionHashes, Transactions};
     use anvil_core::eth::transaction::{LegacyTransaction, TransactionKind, TypedTransaction};
     use ethers::prelude::Signature;
     use fastrlp::{Decodable, Encodable};
@@ -211,7 +211,8 @@ mod test {
         let expected: NewPooledTransactionHashes = vec![
             hex!("fd3f0d4cb96a496ee7b77a238e48435600ce3337ce8f0309b7b57e91bfce89d6"),
             hex!("fd3f0d4cb96a496ee7b77a238e48435600ce3337ce8f0309b7b57e91bfce89d7"),
-        ].into();
+        ]
+        .into();
         let decoded = NewPooledTransactionHashes::decode(&mut &data[..]).unwrap();
         assert_eq!(expected, decoded);
     }
@@ -222,7 +223,8 @@ mod test {
         let tx_hashes: NewPooledTransactionHashes = vec![
             hex!("fd3f0d4cb96a496ee7b77a238e48435600ce3337ce8f0309b7b57e91bfce89d6"),
             hex!("fd3f0d4cb96a496ee7b77a238e48435600ce3337ce8f0309b7b57e91bfce89d7"),
-        ].into();
+        ]
+        .into();
         let mut encoded = vec![];
         tx_hashes.encode(&mut encoded);
         let expected_str = hex::encode(expected);
