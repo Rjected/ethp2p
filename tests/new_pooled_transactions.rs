@@ -1,5 +1,5 @@
 //! Decoding tests for [`NewPooledTransactions`]
-use ethp2p_rs::NewPooledTransactionHashes;
+use ethp2p::NewPooledTransactionHashes;
 use fastrlp::Decodable;
 use std::{fs, path::PathBuf};
 
