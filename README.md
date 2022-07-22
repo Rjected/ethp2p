@@ -1,12 +1,12 @@
 # ethp2p
 
-[![Crates.io][crates-badge]][crates-url]
-[![docs.rs](https://img.shields.io/docsrs/ethp2p)](https://docs.rs/ethp2p)
+<!-- [![Crates.io][crates-badge]][crates-url] -->
+<!-- [![docs.rs](https://img.shields.io/docsrs/ethp2p)](https://docs.rs/ethp2p) -->
 [![MIT License](https://img.shields.io/github/license/rjected/ethp2p)](https://github.com/rjected/ethp2p/blob/main/LICENSE)
 [![CI](https://github.com/rjected/ethp2p/actions/workflows/ci.yml/badge.svg)](https://github.com/rjected/ethp2p/actions/workflows/ci.yml)
 
-[crates-badge]: https://img.shields.io/crates/v/ethp2p.svg
-[crates-url]: https://crates.io/crates/ethp2p
+<!-- [crates-badge]: https://img.shields.io/crates/v/ethp2p.svg -->
+<!-- [crates-url]: https://crates.io/crates/ethp2p -->
 
 P2P types and utilities for working with [`eth`](https://github.com/ethereum/devp2p) protocol
 messages.
@@ -14,13 +14,13 @@ messages.
 `ethp2p` is built on [`anvil`](https://github.com/foundry-rs/foundry/tree/master/anvil) types, and
 implements [`fastrlp`](https://github.com/vorot93/fastrlp) traits for RLP encoding and decoding.
 
-## Usage
+<!-- ## Usage -->
 
-Add this to your `Cargo.toml`:
+<!-- Add this to your `Cargo.toml`: -->
 
-```toml
-[dependencies]
-ethp2p = "0.1"
-```
+<!-- ```toml -->
+<!-- [dependencies] -->
+<!-- ethp2p = "0.1" -->
+<!-- ``` -->
 
 *Compiler support: requires rustc 1.62+*
