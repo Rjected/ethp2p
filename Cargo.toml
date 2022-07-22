@@ -1,5 +1,5 @@
 [package]
-name = "ethp2p-rs"
+name = "ethp2p"
 version = "0.1.0"
 edition = "2021"
 
