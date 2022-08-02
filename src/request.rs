@@ -1,4 +1,7 @@
-use crate::{RequestPair, Status, NewBlockHashes, NewBlock, Transactions, NewPooledTransactionHashes, GetBlockHeaders, GetBlockBodies, GetPooledTransactions, GetNodeData, GetReceipts};
+use crate::{
+    GetBlockBodies, GetBlockHeaders, GetNodeData, GetPooledTransactions, GetReceipts, NewBlock,
+    NewBlockHashes, NewPooledTransactionHashes, RequestPair, Status, Transactions,
+};
 
 // This type is analogous to the `zebra_network::Request` type.
 /// An ethereum network request for version 66.
