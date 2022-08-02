@@ -6,6 +6,12 @@ pub use broadcast::{
 mod message;
 pub use message::{EthMessage, EthMessageID, ProtocolMessage, RequestPair};
 
+mod request;
+pub use request::Request;
+
+mod response;
+pub use response::Response;
+
 mod status;
 pub use status::Status;
 
