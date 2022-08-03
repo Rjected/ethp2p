@@ -3,11 +3,8 @@ name = "ethp2p"
 version = "0.1.0"
 edition = "2021"
 
-[features]
-default = ["proptest-impl"]
-proptest-impl = ["proptest", "proptest-derive"]
-
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
 [dependencies]
 anvil-core = { git = "https://github.com/foundry-rs/foundry" }
 foundry-config = { git = "https://github.com/foundry-rs/foundry" }
@@ -22,11 +19,5 @@ ethereum-forkid = "0.10.0"
 # for display and tests
 hex = "0.4.3"
 
-# proptest dependencies
-proptest = { version = "0.10.1", optional = true }
-proptest-derive = { version = "0.3.0", optional = true }
-
 [dev-dependencies]
 hex-literal = "0.3.4"
-proptest = "0.10.1"
-proptest-derive = "0.3.0"
