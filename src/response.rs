@@ -1,6 +1,5 @@
 use crate::{
-    BlockBodies, BlockHeaders, NewBlock, NewBlockHashes, NewPooledTransactionHashes, NodeData,
-    PooledTransactions, Receipts, RequestPair, Status, Transactions,
+    BlockBodies, BlockHeaders, NodeData, PooledTransactions, Receipts, RequestPair, Status,
 };
 
 // This type is analogous to the `zebra_network::Response` type.
@@ -12,18 +11,6 @@ pub enum Response {
 
     /// The [`Status`](super::Status) message response in the eth protocol handshake.
     Status(Status),
-
-    /// A list of block hashes seen on the network.
-    NewBlockHashes(NewBlockHashes),
-
-    /// A new block seen on the network.
-    NewBlock(Box<NewBlock>),
-
-    /// A list of transactions seen on the network.
-    Transactions(Transactions),
-
-    /// A list of transaction hashes seen on the network.
-    NewPooledTransactionHashes(NewPooledTransactionHashes),
 
     /// The response to a [`Request::GetBlockHeaders`](super::Request::GetBlockHeaders) request.
     BlockHeaders(RequestPair<BlockHeaders>),
