@@ -32,18 +32,19 @@ jobs:
         uses: actions/checkout@v3
       - name: Setup Pages
         uses: actions/configure-pages@v1
-      - name: Install latest rust beta
-        uses: actions-rs/toolchain@v1 
-        with: 
-          toolchain: beta 
-          components: rust-docs 
-          override: true 
-  
-      - uses: Swatinem/rust-cache@v1
+      - name: install rust beta
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: beta
+          components: rust-docs
+          override: true
 
-      - name: Build external docs 
-         run: |
-           cargo doc --no-deps --workspace
+      - uses: Swatinem/rust-cache@v1
+
+      - name: Build external docs
+        run: |
+          cargo doc --no-deps --workspace
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
