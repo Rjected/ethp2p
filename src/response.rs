@@ -1,33 +1,42 @@
 use crate::{
-    GetBlockBodies, GetBlockHeaders, GetNodeData, GetPooledTransactions, GetReceipts, NewBlock,
-    NewBlockHashes, NewPooledTransactionHashes, RequestPair, Status, Transactions,
+    BlockBodies, BlockHeaders, NewBlock, NewBlockHashes, NewPooledTransactionHashes, NodeData,
+    PooledTransactions, Receipts, RequestPair, Status, Transactions,
 };
 
 // This type is analogous to the `zebra_network::Response` type.
 /// An ethereum network response for version 66.
-/// TODO: document the response variants.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum Response {
     /// The request does not have a response.
-    ///
-    /// Either:
-    ///  * the request does not need a response, or
-    ///  * we have no useful data to provide in response to the request,
-    ///    or the request does not require any response.
-    ///
-    /// (Inventory requests provide a list of missing hashes if none of the hashes were available.)
     Nil,
 
+    /// The [`Status`](super::Status) message response in the eth protocol handshake.
     Status(Status),
 
+    /// A list of block hashes seen on the network.
     NewBlockHashes(NewBlockHashes),
+
+    /// A new block seen on the network.
     NewBlock(Box<NewBlock>),
+
+    /// A list of transactions seen on the network.
     Transactions(Transactions),
+
+    /// A list of transaction hashes seen on the network.
     NewPooledTransactionHashes(NewPooledTransactionHashes),
 
-    GetBlockHeaders(RequestPair<GetBlockHeaders>),
-    GetBlockBodies(RequestPair<GetBlockBodies>),
-    GetPooledTransactions(RequestPair<GetPooledTransactions>),
-    GetNodeData(RequestPair<GetNodeData>),
-    GetReceipts(RequestPair<GetReceipts>),
+    /// The response to a [`Request::GetBlockHeaders`](super::Request::GetBlockHeaders) request.
+    BlockHeaders(RequestPair<BlockHeaders>),
+
+    /// The response to a [`Request::GetBlockBodies`](super::Request::GetBlockBodies) request.
+    BlockBodies(RequestPair<BlockBodies>),
+
+    /// The response to a [`Request::GetPooledTransactions`](super::Request::GetPooledTransactions) request.
+    PooledTransactions(RequestPair<PooledTransactions>),
+
+    /// The response to a [`Request::GetNodeData`](super::Request::GetNodeData) request.
+    NodeData(RequestPair<NodeData>),
+
+    /// The response to a [`Request::GetReceipts`](super::Request::GetReceipts) request.
+    Receipts(RequestPair<Receipts>),
 }
