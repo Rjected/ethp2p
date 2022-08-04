@@ -67,6 +67,8 @@ jobs:
           sed -i 's/\(\.\.\/\(ethp2p\/\)*\)//g' $(find target/doc/ethp2p -type f)
           sed -i 's/href=\\"ethp2p\//href=\\"/g' $(find target/doc/implementors -type f)
           sed -i 's/ethp2p\/index.html/index.html/g' $(find target/doc -type f)
+          # even more sorry
+          sed -i 's/\(path.replace(\/::\/g,"\/")\)/\1.split("\/").slice(1).join("\/")/g' target/doc/search.js
           mv target/doc/$(cargo metadata --format-version 1 | jq '.["workspace_members"][0]' | sed 's/"//' | awk '{ print $1 }')/* target/doc
 
       - name: Upload artifact
