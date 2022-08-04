@@ -30,8 +30,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
       - name: Setup Pages
         uses: actions/configure-pages@v1
+
       - name: install rust beta
         uses: actions-rs/toolchain@v1
         with:
@@ -45,11 +47,34 @@ jobs:
         run: |
           cargo doc --no-deps --workspace
 
+      # cargo doc stores its index.html in ./<package-name>/
+      # to allow for the github pages site to serve documentation on the root
+      # domain, we need to lift the ./<package-name>/ directory.
+      # This will only work for single package repos!
+      # It doesn't make sense for multi-package repos, since there will be
+      # multiple workspace members, and it's ambiguous which one should be
+      # picked as the index.
+      # This is not ambiguous if you only have a single workspace member to be
+      # documented.
+      # Related issues here:
+      # https://github.com/rust-lang/cargo/issues/739
+      # https://github.com/rust-lang/rust/issues/16103
+      # TODO: fix
+      # We then need to correct all links - see comment below
+      - name: Hack index.html and links up one level
+        run: |
+          # im sorry for doing this
+          sed -i 's/\(\.\.\/\(ethp2p\/\)*\)//g' $(find target/doc/ethp2p -type f)
+          sed -i 's/href=\\"ethp2p\//href=\\"/g' $(find target/doc/implementors -type f)
+          sed -i 's/ethp2p\/index.html/index.html/g' $(find target/doc -type f)
+          mv target/doc/$(cargo metadata --format-version 1 | jq '.["workspace_members"][0]' | sed 's/"//' | awk '{ print $1 }')/* target/doc
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
           # Upload rustdoc default directory
           path: 'target/doc'
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@main
