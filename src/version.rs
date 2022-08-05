@@ -1,5 +1,5 @@
-use thiserror::Error;
 use std::str::FromStr;
+use thiserror::Error;
 
 use serde::{Deserialize, Serialize};
 
