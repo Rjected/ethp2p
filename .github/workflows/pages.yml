@@ -45,6 +45,7 @@ jobs:
 
       - name: Build external docs
         run: |
+          cargo clean
           cargo doc --no-deps --workspace
 
       # cargo doc stores its index.html in ./<package-name>/
