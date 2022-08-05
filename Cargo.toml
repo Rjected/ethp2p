@@ -18,6 +18,7 @@ ethereum-forkid = "0.10.0"
 
 # for display and tests
 hex = "0.4.3"
+thiserror = "1.0.32"
 
 [dev-dependencies]
 hex-literal = "0.3.4"
