@@ -18,3 +18,10 @@ impl TryFrom<String> for EthVersion {
         }
     }
 }
+
+impl From<EthVersion> for u8 {
+    #[inline]
+    fn from(v: EthVersion) -> u8 {
+        v as u8
+    }
+}
