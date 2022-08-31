@@ -1,3 +1,5 @@
+use fastrlp::Encodable;
+
 use crate::{
     GetBlockBodies, GetBlockHeaders, GetNodeData, GetPooledTransactions, GetReceipts, NewBlock,
     NewBlockHashes, NewPooledTransactionHashes, RequestPair, Status, Transactions,
@@ -83,4 +85,55 @@ pub enum Request {
     ///
     /// Returns [`Response::Receipts`](super::Response::Receipts).
     GetReceipts(RequestPair<GetReceipts>),
+}
+
+/// Encode a [`Request`] into a byte vector, or calculate its RLP length.
+///
+/// # Example
+/// ```rust
+/// use ethp2p::{Request, Response};
+///
+/// let request = Request::Status(Status::default());
+/// let mut encoding = vec![];
+/// request.encode(&mut encoding).unwrap();
+///
+/// ```
+impl Encodable for Request {
+    fn length(&self) -> usize {
+        match self {
+            Request::Status(status) => status.length(),
+            Request::NewBlockHashes(new_block_hashes) => new_block_hashes.length(),
+            Request::NewBlock(new_block) => new_block.length(),
+            Request::Transactions(transactions) => transactions.length(),
+            Request::NewPooledTransactionHashes(new_pooled_transaction_hashes) => {
+                new_pooled_transaction_hashes.length()
+            }
+            Request::GetBlockHeaders(get_block_headers) => get_block_headers.length(),
+            Request::GetBlockBodies(get_block_bodies) => get_block_bodies.length(),
+            Request::GetPooledTransactions(get_pooled_transactions) => {
+                get_pooled_transactions.length()
+            }
+            Request::GetNodeData(get_node_data) => get_node_data.length(),
+            Request::GetReceipts(get_receipts) => get_receipts.length(),
+        }
+    }
+
+    fn encode(&self, out: &mut dyn bytes::BufMut) {
+        match self {
+            Request::Status(status) => status.encode(out),
+            Request::NewBlockHashes(new_block_hashes) => new_block_hashes.encode(out),
+            Request::NewBlock(new_block) => new_block.encode(out),
+            Request::Transactions(transactions) => transactions.encode(out),
+            Request::NewPooledTransactionHashes(new_pooled_transaction_hashes) => {
+                new_pooled_transaction_hashes.encode(out)
+            }
+            Request::GetBlockHeaders(get_block_headers) => get_block_headers.encode(out),
+            Request::GetBlockBodies(get_block_bodies) => get_block_bodies.encode(out),
+            Request::GetPooledTransactions(get_pooled_transactions) => {
+                get_pooled_transactions.encode(out)
+            }
+            Request::GetNodeData(get_node_data) => get_node_data.encode(out),
+            Request::GetReceipts(get_receipts) => get_receipts.encode(out),
+        }
+    }
 }
