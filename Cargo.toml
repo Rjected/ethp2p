@@ -22,7 +22,9 @@ thiserror = "1.0.32"
 
 [dev-dependencies]
 hex-literal = "0.3.4"
+eyre = "0.6"
+anvil = { git = "https://github.com/foundry-rs/foundry" }
 
-# temp
+# temp, for foundry
 [patch.crates-io]
 revm = { git = "https://github.com/onbjerg/revm", branch = "onbjerg/bytecode-hash" }
