@@ -1,15 +1,16 @@
 //! Construct a [`Status`](ethp2p::Status) and print out its encoding, then decode the [`Status`]
 //! message from bytes.
 
+use anvil::Hardfork;
+use ethp2p::{EthVersion, Status};
 use eyre::Result;
+use fastrlp::{Decodable, Encodable};
+use foundry_config::Chain;
 use hex_literal::hex;
 use ruint::uint;
-use ethp2p::{Status, EthVersion};
-use foundry_config::Chain;
-use fastrlp::{Encodable, Decodable};
-use anvil::Hardfork;
 
-const ETH_GENESIS = hex!("d4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3");
+const ETH_GENESIS: [u8; 32] =
+    hex!("d4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3");
 
 fn main() -> Result<()> {
     let status = Status {
@@ -26,7 +27,10 @@ fn main() -> Result<()> {
     let mut encoded_status = vec![];
     status.encode(encoded_status);
 
-    println!("The RLP encoded status message: {}", hex::encode(encoded_status));
+    println!(
+        "The RLP encoded status message: {}",
+        hex::encode(encoded_status)
+    );
 
     let decoded_status = Status::decode(&mut encoded_status)?;
     assert_eq!(decoded_status, status);
