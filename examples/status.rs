@@ -25,13 +25,13 @@ fn main() -> Result<()> {
     println!("Encoding the following status message: {:?}", status);
 
     let mut encoded_status = vec![];
-    status.encode(encoded_status);
+    status.encode(&mut encoded_status);
 
     println!(
         "The RLP encoded status message: {}",
         hex::encode(encoded_status)
     );
 
-    let decoded_status = Status::decode(&mut encoded_status)?;
+    let decoded_status = Status::decode(&mut encoded_status[..])?;
     assert_eq!(decoded_status, status);
 }
