@@ -25,7 +25,7 @@ jobs:
         override: true
         components: rustfmt, clippy
     - name: Build
-      run: cargo build --verbose
+      run: cargo build --verbose --all-targets
     - name: Run tests
       run: cargo test --verbose
 
@@ -48,7 +48,7 @@ jobs:
       - name: cargo fmt
         run: cargo +nightly fmt --all -- --check
       - name: cargo clippy
-        run: cargo +nightly clippy --all-features -- -D warnings
+        run: cargo +nightly clippy --all-targets --all-features -- -D warnings
 
   publish:
     # Only do this job if publishing a release

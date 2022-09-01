@@ -22,3 +22,7 @@ thiserror = "1.0.32"
 
 [dev-dependencies]
 hex-literal = "0.3.4"
+
+# temp
+[patch.crates-io]
+revm = { git = "https://github.com/onbjerg/revm", branch = "onbjerg/bytecode-hash" }
