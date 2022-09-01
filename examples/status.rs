@@ -2,8 +2,8 @@
 //! message from bytes.
 
 use anvil::Hardfork;
-use ethp2p::{EthVersion, Status};
 use ethers::types::Chain::Mainnet;
+use ethp2p::{EthVersion, Status};
 use eyre::Result;
 use fastrlp::{Decodable, Encodable};
 use foundry_config::Chain;
