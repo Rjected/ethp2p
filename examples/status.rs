@@ -3,6 +3,7 @@
 
 use anvil::Hardfork;
 use ethp2p::{EthVersion, Status};
+use ethers::types::Chain::Mainnet;
 use eyre::Result;
 use fastrlp::{Decodable, Encodable};
 use foundry_config::Chain;
@@ -15,23 +16,24 @@ const ETH_GENESIS: [u8; 32] =
 fn main() -> Result<()> {
     let status = Status {
         version: EthVersion::Eth67 as u8,
-        chain: Chain::Id(1),
+        chain: Chain::Named(Mainnet),
         total_difficulty: uint!(54928867412924629891081_U256),
         blockhash: hex!("6890edf8ad6900a5472c2a7ee3ef795f020ef6f907afb7f4ebf6a92d6aeb1804"),
         genesis: ETH_GENESIS,
         forkid: Hardfork::Latest.fork_id(),
     };
 
-    println!("Encoding the following status message: {:?}", status);
+    println!("Encoding the following status message:\n{:#?}", status);
 
     let mut encoded_status = vec![];
     status.encode(&mut encoded_status);
 
     println!(
-        "The RLP encoded status message: {}",
-        hex::encode(encoded_status)
+        "Here is the RLP encoded status message: {}",
+        hex::encode(&encoded_status)
     );
 
-    let decoded_status = Status::decode(&mut encoded_status[..])?;
+    let decoded_status = Status::decode(&mut &encoded_status[..])?;
     assert_eq!(decoded_status, status);
+    Ok(())
 }
