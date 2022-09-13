@@ -489,8 +489,8 @@ mod test {
         let mut encoded = vec![];
         transactions.encode(&mut encoded);
         assert_eq!(encoded.len(), transactions.length());
-        let encoded_str = hex::encode(&encoded);
-        let expected_str = hex::encode(&expected);
+        let encoded_str = hex::encode(encoded);
+        let expected_str = hex::encode(expected);
         assert_eq!(encoded_str.len(), expected_str.len());
         assert_eq!(encoded_str, expected_str);
     }

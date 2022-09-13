@@ -42,8 +42,8 @@ pub struct Status {
 // traits like this rather than having to manually implement them.
 impl Display for Status {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let hexed_blockhash = hex::encode(&self.blockhash);
-        let hexed_genesis = hex::encode(&self.genesis);
+        let hexed_blockhash = hex::encode(self.blockhash);
+        let hexed_genesis = hex::encode(self.genesis);
         write!(
             f,
             "Status {{ version: {}, chain: {}, total_difficulty: {}, blockhash: {}, genesis: {}, forkid: {:X?} }}",
@@ -59,8 +59,8 @@ impl Display for Status {
 
 impl Debug for Status {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let hexed_blockhash = hex::encode(&self.blockhash);
-        let hexed_genesis = hex::encode(&self.genesis);
+        let hexed_blockhash = hex::encode(self.blockhash);
+        let hexed_genesis = hex::encode(self.genesis);
         if f.alternate() {
             write!(
                 f,
