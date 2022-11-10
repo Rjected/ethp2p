@@ -1,5 +1,5 @@
 use anvil_core::eth::receipt::TypedReceipt;
-use fastrlp::{RlpDecodableWrapper, RlpEncodableWrapper};
+use open_fastrlp::{RlpDecodableWrapper, RlpEncodableWrapper};
 
 /// A request for transaction receipts from the given block hashes.
 #[derive(Clone, Debug, PartialEq, Eq, RlpEncodableWrapper, RlpDecodableWrapper)]
@@ -22,7 +22,7 @@ mod test {
     use hex_literal::hex;
 
     use crate::{message::RequestPair, GetReceipts, Receipts};
-    use fastrlp::{Decodable, Encodable};
+    use open_fastrlp::{Decodable, Encodable};
 
     #[test]
     // Test vector from: https://eips.ethereum.org/EIPS/eip-2481

@@ -1,6 +1,6 @@
 //! Decoding tests for [`NewBlock`]
 use ethp2p::NewBlock;
-use fastrlp::Decodable;
+use open_fastrlp::Decodable;
 use std::{fs, path::PathBuf};
 
 #[test]

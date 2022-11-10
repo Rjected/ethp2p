@@ -1,7 +1,7 @@
-use ethereum_forkid::ForkId;
-use fastrlp::{RlpDecodable, RlpEncodable};
+use super::forkid::ForkId;
+use ethers::types::U256;
 use foundry_config::Chain;
-use ruint::Uint;
+use open_fastrlp::{RlpDecodable, RlpEncodable};
 use std::fmt::{Debug, Display};
 
 /// The status message is used in the eth protocol handshake to ensure that peers are on the same
@@ -22,7 +22,7 @@ pub struct Status {
     pub chain: Chain,
 
     /// Total difficulty of the best chain.
-    pub total_difficulty: Uint<256, 4>,
+    pub total_difficulty: U256,
 
     /// The highest difficulty block hash the peer has seen
     pub blockhash: [u8; 32],
@@ -89,14 +89,11 @@ impl Debug for Status {
 
 #[cfg(test)]
 mod tests {
-    use std::str::FromStr;
-
-    use ethereum_forkid::{ForkHash, ForkId};
+    use crate::forkid::{ForkHash, ForkId};
     use ethers::prelude::Chain as NamedChain;
-    use fastrlp::{Decodable, Encodable};
     use foundry_config::Chain;
     use hex_literal::hex;
-    use ruint::Uint;
+    use open_fastrlp::{Decodable, Encodable};
 
     use crate::{EthVersion, Status};
 
@@ -107,7 +104,8 @@ mod tests {
             version: EthVersion::Eth67 as u8,
             // ethers versions arent the same due to patches, so using Id here
             chain: Chain::Named(NamedChain::Mainnet),
-            total_difficulty: Uint::from(36206751599115524359527u128),
+            // total_difficulty: Uint::from(36206751599115524359527u128),
+            total_difficulty: ethers::types::U256::from(36206751599115524359527u128),
             blockhash: hex!("feb27336ca7923f8fab3bd617fcb6e75841538f71c1bcfc267d7838489d9e13d"),
             genesis: hex!("d4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3"),
             forkid: ForkId {
@@ -128,7 +126,7 @@ mod tests {
             version: EthVersion::Eth67 as u8,
             // ethers versions arent the same due to patches, so using Id here
             chain: Chain::Named(NamedChain::Mainnet),
-            total_difficulty: Uint::from(36206751599115524359527u128),
+            total_difficulty: ethers::types::U256::from(36206751599115524359527u128),
             blockhash: hex!("feb27336ca7923f8fab3bd617fcb6e75841538f71c1bcfc267d7838489d9e13d"),
             genesis: hex!("d4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3"),
             forkid: ForkId {
@@ -146,7 +144,7 @@ mod tests {
         let status = Status {
             version: EthVersion::Eth66 as u8,
             chain: Chain::Named(NamedChain::BinanceSmartChain),
-            total_difficulty: Uint::from(37851386u64),
+            total_difficulty: ethers::types::U256::from(37851386u64),
             blockhash: hex!("f8514c4680ef27700751b08f37645309ce65a449616a3ea966bf39dd935bb27b"),
             genesis: hex!("0d21840abff46b96c84b2ac9e10e4f5cdaeb5693cb665db62a2f3b02d2d57b5b"),
             forkid: ForkId {
@@ -166,7 +164,7 @@ mod tests {
         let expected = Status {
             version: EthVersion::Eth66 as u8,
             chain: Chain::Named(NamedChain::BinanceSmartChain),
-            total_difficulty: Uint::from(37851386u64),
+            total_difficulty: ethers::types::U256::from(37851386u64),
             blockhash: hex!("f8514c4680ef27700751b08f37645309ce65a449616a3ea966bf39dd935bb27b"),
             genesis: hex!("0d21840abff46b96c84b2ac9e10e4f5cdaeb5693cb665db62a2f3b02d2d57b5b"),
             forkid: ForkId {
@@ -184,10 +182,9 @@ mod tests {
         let expected = Status {
             version: EthVersion::Eth66 as u8,
             chain: Chain::Id(2100),
-            total_difficulty: Uint::from_str(
+            total_difficulty: ethers::types::U256::from(
                 "0x000000000000000000000000006d68fcffffffffffffffffffffffffdeab81b8",
-            )
-            .unwrap(),
+            ),
             blockhash: hex!("523e8163a6d620a4cc152c547a05f28a03fec91a2a615194cb86df9731372c0c"),
             genesis: hex!("6499dccdc7c7def3ebb1ce4c6ee27ec6bd02aee570625ca391919faf77ef27bd"),
             forkid: ForkId {

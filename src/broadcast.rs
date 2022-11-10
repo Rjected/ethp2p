@@ -1,6 +1,6 @@
 use anvil_core::eth::{block::Block, transaction::TypedTransaction};
-use fastrlp::{RlpDecodable, RlpDecodableWrapper, RlpEncodable, RlpEncodableWrapper};
-use ruint::Uint;
+use ethers::types::U128;
+use open_fastrlp::{RlpDecodable, RlpDecodableWrapper, RlpEncodable, RlpEncodableWrapper};
 
 /// This informs peers of new blocks that have appeared on the network.
 #[derive(Clone, Debug, PartialEq, Eq, RlpEncodableWrapper, RlpDecodableWrapper)]
@@ -38,7 +38,7 @@ pub struct NewBlock {
     /// A new block.
     pub block: Block,
     /// The current total difficulty.
-    pub td: Uint<128, 2>,
+    pub td: U128,
 }
 
 /// This informs peers of transactions that have appeared on the network and are not yet included
@@ -82,8 +82,8 @@ mod test {
     use crate::{BlockHashNumber, NewBlockHashes, NewPooledTransactionHashes, Transactions};
     use anvil_core::eth::transaction::{LegacyTransaction, TransactionKind, TypedTransaction};
     use ethers::prelude::Signature;
-    use fastrlp::{Decodable, Encodable};
     use hex_literal::hex;
+    use open_fastrlp::{Decodable, Encodable};
 
     #[test]
     fn decode_transactions_network() {

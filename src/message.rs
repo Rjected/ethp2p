@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 
-use fastrlp::{length_of_length, Decodable, Encodable, Header};
+use open_fastrlp::{length_of_length, Decodable, Encodable, Header};
 
 use crate::{
     blocks::{BlockBodies, BlockHeaders, GetBlockBodies},
@@ -21,7 +21,7 @@ impl ProtocolMessage {
     pub fn decode_message(
         message_type: EthMessageID,
         buf: &mut &[u8],
-    ) -> Result<Self, fastrlp::DecodeError> {
+    ) -> Result<Self, open_fastrlp::DecodeError> {
         let message = match message_type {
             EthMessageID::Status => EthMessage::Status(Status::decode(buf)?),
             EthMessageID::NewBlockHashes => {
@@ -95,7 +95,7 @@ impl Encodable for ProtocolMessage {
 /// Decodes a protocol message from bytes, using the first byte to determine the message type.
 /// This decodes `eth/66` request ids for each message type.
 impl Decodable for ProtocolMessage {
-    fn decode(buf: &mut &[u8]) -> Result<Self, fastrlp::DecodeError> {
+    fn decode(buf: &mut &[u8]) -> Result<Self, open_fastrlp::DecodeError> {
         let message_type = EthMessageID::decode(buf)?;
         Self::decode_message(message_type, buf)
     }
@@ -241,8 +241,10 @@ impl Encodable for EthMessageID {
 }
 
 impl Decodable for EthMessageID {
-    fn decode(buf: &mut &[u8]) -> Result<Self, fastrlp::DecodeError> {
-        let id = buf.first().ok_or(fastrlp::DecodeError::InputTooShort)?;
+    fn decode(buf: &mut &[u8]) -> Result<Self, open_fastrlp::DecodeError> {
+        let id = buf
+            .first()
+            .ok_or(open_fastrlp::DecodeError::InputTooShort)?;
         Ok(match id {
             0x00 => EthMessageID::Status,
             0x01 => EthMessageID::NewBlockHashes,
@@ -259,7 +261,7 @@ impl Decodable for EthMessageID {
             0x0e => EthMessageID::NodeData,
             0x0f => EthMessageID::GetReceipts,
             0x10 => EthMessageID::Receipts,
-            _ => return Err(fastrlp::DecodeError::Custom("Invalid message ID")),
+            _ => return Err(open_fastrlp::DecodeError::Custom("Invalid message ID")),
         })
     }
 }
@@ -314,7 +316,7 @@ where
         length
     }
 
-    fn encode(&self, out: &mut dyn fastrlp::BufMut) {
+    fn encode(&self, out: &mut dyn open_fastrlp::BufMut) {
         let header = Header {
             list: true,
             payload_length: self.request_id.length() + self.message.length(),
@@ -331,7 +333,7 @@ impl<T> Decodable for RequestPair<T>
 where
     T: Decodable,
 {
-    fn decode(buf: &mut &[u8]) -> Result<Self, fastrlp::DecodeError> {
+    fn decode(buf: &mut &[u8]) -> Result<Self, open_fastrlp::DecodeError> {
         let _header = Header::decode(buf)?;
         Ok(Self {
             request_id: u64::decode(buf)?,
@@ -343,8 +345,8 @@ where
 #[cfg(test)]
 mod test {
     use crate::message::RequestPair;
-    use fastrlp::{Decodable, Encodable};
     use hex_literal::hex;
+    use open_fastrlp::{Decodable, Encodable};
 
     fn encode<T: Encodable>(value: T) -> Vec<u8> {
         let mut buf = vec![];
