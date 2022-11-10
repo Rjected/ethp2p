@@ -31,6 +31,7 @@ mod version;
 pub use version::EthVersion;
 
 mod forkid;
+pub use forkid::{ForkId, ForkHash, ForkFilter};
 
 // impl from for each variant of EthMessage
 macro_rules! message_from_impl {
