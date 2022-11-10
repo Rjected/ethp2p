@@ -242,7 +242,9 @@ impl Encodable for EthMessageID {
 
 impl Decodable for EthMessageID {
     fn decode(buf: &mut &[u8]) -> Result<Self, open_fastrlp::DecodeError> {
-        let id = buf.first().ok_or(open_fastrlp::DecodeError::InputTooShort)?;
+        let id = buf
+            .first()
+            .ok_or(open_fastrlp::DecodeError::InputTooShort)?;
         Ok(match id {
             0x00 => EthMessageID::Status,
             0x01 => EthMessageID::NewBlockHashes,
@@ -343,8 +345,8 @@ where
 #[cfg(test)]
 mod test {
     use crate::message::RequestPair;
-    use open_fastrlp::{Decodable, Encodable};
     use hex_literal::hex;
+    use open_fastrlp::{Decodable, Encodable};
 
     fn encode<T: Encodable>(value: T) -> Vec<u8> {
         let mut buf = vec![];

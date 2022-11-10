@@ -3,8 +3,8 @@
 #![doc = include_str!("../README.md")]
 
 use crc::crc32;
-use open_fastrlp::*;
 use maplit::btreemap;
+use open_fastrlp::*;
 use primitive_types::H256;
 use std::{
     collections::{BTreeMap, BTreeSet},

@@ -1,7 +1,7 @@
 use super::forkid::ForkId;
 use ethers::types::U256;
-use open_fastrlp::{RlpDecodable, RlpEncodable};
 use foundry_config::Chain;
+use open_fastrlp::{RlpDecodable, RlpEncodable};
 use std::fmt::{Debug, Display};
 
 /// The status message is used in the eth protocol handshake to ensure that peers are on the same
@@ -91,9 +91,9 @@ impl Debug for Status {
 mod tests {
     use crate::forkid::{ForkHash, ForkId};
     use ethers::prelude::Chain as NamedChain;
-    use open_fastrlp::{Decodable, Encodable};
     use foundry_config::Chain;
     use hex_literal::hex;
+    use open_fastrlp::{Decodable, Encodable};
 
     use crate::{EthVersion, Status};
 

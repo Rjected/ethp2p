@@ -35,7 +35,9 @@ impl Encodable for BlockHashOrNumber {
 /// Allows for RLP decoding of a block hash or block number
 impl Decodable for BlockHashOrNumber {
     fn decode(buf: &mut &[u8]) -> Result<Self, open_fastrlp::DecodeError> {
-        let header: u8 = *buf.first().ok_or(open_fastrlp::DecodeError::InputTooShort)?;
+        let header: u8 = *buf
+            .first()
+            .ok_or(open_fastrlp::DecodeError::InputTooShort)?;
         // if the byte string is exactly 32 bytes, decode it into a Hash
         // 0xa0 = 0x80 (start of string) + 0x20 (32, length of string)
         if header == 0xa0 {
@@ -148,8 +150,8 @@ mod test {
         transaction::{LegacyTransaction, TransactionKind, TypedTransaction},
     };
     use ethers::core::types::{Bytes, Signature, H64, U256};
-    use open_fastrlp::{Decodable, Encodable};
     use hex_literal::hex;
+    use open_fastrlp::{Decodable, Encodable};
 
     use crate::{message::RequestPair, BlockBodies, BlockHeaders, GetBlockBodies, GetBlockHeaders};
 

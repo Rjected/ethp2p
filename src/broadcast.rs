@@ -82,8 +82,8 @@ mod test {
     use crate::{BlockHashNumber, NewBlockHashes, NewPooledTransactionHashes, Transactions};
     use anvil_core::eth::transaction::{LegacyTransaction, TransactionKind, TypedTransaction};
     use ethers::prelude::Signature;
-    use open_fastrlp::{Decodable, Encodable};
     use hex_literal::hex;
+    use open_fastrlp::{Decodable, Encodable};
 
     #[test]
     fn decode_transactions_network() {
