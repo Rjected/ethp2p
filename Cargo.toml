@@ -13,7 +13,6 @@ bytes = { version = "1.1.0" }
 serde = "1.0.137"
 serde_json = "1.0.81"
 open-fastrlp = { version = "0.1.2", features = ["alloc", "derive", "std"] }
-ethereum-forkid = "0.10.0"
 
 # for display and tests
 hex = "0.4.3"
