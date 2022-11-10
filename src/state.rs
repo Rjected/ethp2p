@@ -1,4 +1,4 @@
-use fastrlp::{RlpDecodableWrapper, RlpEncodableWrapper};
+use open_fastrlp::{RlpDecodableWrapper, RlpEncodableWrapper};
 
 /// A request for state tree nodes corresponding to the given hashes.
 /// This message was removed in `eth/67`, only clients running `eth/66` or earlier will respond to
@@ -19,7 +19,7 @@ mod test {
     use hex_literal::hex;
 
     use crate::{message::RequestPair, GetNodeData, NodeData};
-    use fastrlp::{Decodable, Encodable};
+    use open_fastrlp::{Decodable, Encodable};
 
     #[test]
     // Test vector from: https://eips.ethereum.org/EIPS/eip-2481

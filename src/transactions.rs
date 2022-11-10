@@ -1,5 +1,5 @@
 use anvil_core::eth::transaction::TypedTransaction;
-use fastrlp::{RlpDecodableWrapper, RlpEncodableWrapper};
+use open_fastrlp::{RlpDecodableWrapper, RlpEncodableWrapper};
 
 /// A list of transaction hashes that the peer would like transaction bodies for.
 #[derive(Clone, Debug, PartialEq, Eq, RlpEncodableWrapper, RlpDecodableWrapper)]
@@ -88,7 +88,7 @@ mod test {
     use hex_literal::hex;
 
     use crate::{message::RequestPair, GetPooledTransactions, PooledTransactions};
-    use fastrlp::{Decodable, Encodable};
+    use open_fastrlp::{Decodable, Encodable};
 
     #[test]
     // Test vector from: https://eips.ethereum.org/EIPS/eip-2481

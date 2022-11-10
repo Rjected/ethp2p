@@ -2,7 +2,7 @@ use anvil_core::eth::{
     block::{Block, Header},
     transaction::TypedTransaction,
 };
-use fastrlp::{
+use open_fastrlp::{
     Decodable, Encodable, RlpDecodable, RlpDecodableWrapper, RlpEncodable, RlpEncodableWrapper,
 };
 use serde::{Deserialize, Serialize};
@@ -34,8 +34,8 @@ impl Encodable for BlockHashOrNumber {
 
 /// Allows for RLP decoding of a block hash or block number
 impl Decodable for BlockHashOrNumber {
-    fn decode(buf: &mut &[u8]) -> Result<Self, fastrlp::DecodeError> {
-        let header: u8 = *buf.first().ok_or(fastrlp::DecodeError::InputTooShort)?;
+    fn decode(buf: &mut &[u8]) -> Result<Self, open_fastrlp::DecodeError> {
+        let header: u8 = *buf.first().ok_or(open_fastrlp::DecodeError::InputTooShort)?;
         // if the byte string is exactly 32 bytes, decode it into a Hash
         // 0xa0 = 0x80 (start of string) + 0x20 (32, length of string)
         if header == 0xa0 {
@@ -148,7 +148,7 @@ mod test {
         transaction::{LegacyTransaction, TransactionKind, TypedTransaction},
     };
     use ethers::core::types::{Bytes, Signature, H64, U256};
-    use fastrlp::{Decodable, Encodable};
+    use open_fastrlp::{Decodable, Encodable};
     use hex_literal::hex;
 
     use crate::{message::RequestPair, BlockBodies, BlockHeaders, GetBlockBodies, GetBlockHeaders};

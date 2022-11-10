@@ -30,6 +30,8 @@ pub use state::{GetNodeData, NodeData};
 mod version;
 pub use version::EthVersion;
 
+mod forkid;
+
 // impl from for each variant of EthMessage
 macro_rules! message_from_impl {
     ($t:ty, $variant:ident) => {
