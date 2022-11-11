@@ -17,7 +17,7 @@ open-fastrlp = { version = "0.1.2", features = ["alloc", "derive", "std"] }
 # for display and tests
 hex = "0.4.3"
 thiserror = "1.0.32"
-crc = "1"
+crc = "3"
 primitive-types = "0.12.1"
 maplit = "1.0.2"
 
