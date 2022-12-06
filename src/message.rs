@@ -372,9 +372,7 @@ mod test {
         assert_eq!(
             expected[..],
             got,
-            "expected: {:X?}, got: {:X?}",
-            expected,
-            got,
+            "expected: {expected:X?}, got: {got:X?}",
         );
     }
 
