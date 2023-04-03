@@ -14,6 +14,9 @@ messages.
 `ethp2p` is built on [`anvil`](https://github.com/foundry-rs/foundry/tree/master/anvil) types, and
 implements [`fastrlp`](https://github.com/vorot93/fastrlp) traits for RLP encoding and decoding.
 
+## ⚠️⚠️ Update:
+This has been integrated into [reth](https://github.com/paradigmxyz/reth), use [reth-eth-wire](https://github.com/paradigmxyz/reth/tree/main/crates/net/eth-wire) instead!
+
 ## Usage
 
 Add this to your `Cargo.toml`:
