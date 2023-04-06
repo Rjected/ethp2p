@@ -22,4 +22,4 @@ primitive-types = "0.12.1"
 maplit = "1.0.2"
 
 [dev-dependencies]
-hex-literal = "0.3.4"
+hex-literal = "0.4.1"
